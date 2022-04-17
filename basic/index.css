@@ -25,6 +25,8 @@ canvas {
 	user-select: none;
 }
 
+.controls > div.hidden { display: none; }
+
 .controls > div {
 	display: inline-block;
 }
@@ -35,6 +37,8 @@ canvas {
 	color: white;
 	cursor: pointer;
 }
+/*
 .controls > div + div {
 	margin-left: 0.5em;
 }
+*/
