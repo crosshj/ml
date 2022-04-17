@@ -1,26 +1,29 @@
 
 const Timer = (fn, time) => {
 	let running = false;
-	let lastTime = (new Date()).getTime();
+	let lastTime;
+
 	function timer() {
 		if(!running) return;
 		window.requestAnimationFrame(timer);
-		var currentTime = (new Date()).getTime();
+		const currentTime = (new Date()).getTime();
 
 		if (currentTime - lastTime >= time) {
 			lastTime = currentTime;
 			fn();
 		}
 	}
-	timer();
 
 	return {
-		pause: () => running = false,
+		pause: () => {
+			running = false;
+		},
 		play: () => {
+			lastTime = (new Date()).getTime();
 			running = true;
 			timer();
 		}
-	}
+	};
 };
 
 class Controls {
@@ -86,6 +89,6 @@ class Board {
 }
 
 const board = new Board();
-const timer = Timer(board.render.bind(board), 300)
+const timer = Timer(board.render.bind(board), 300);
 
 const controls = new Controls(timer);
