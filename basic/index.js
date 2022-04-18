@@ -1,3 +1,7 @@
+/*
+for flocking followers, see: https://caza.la/synaptic/
+*/
+
 
 const Timer = (fn, time) => {
 	let running = false;
