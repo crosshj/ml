@@ -26,15 +26,15 @@ let design = [2,10,5,1];
 let options = {
 	learning_rate: 0.3,
 	activation: function(x){
-		return (1 / (1 + Math.exp(-x)) );
-		//return Math.max(0, x); //relu
+		//return (1 / (1 + Math.exp(-x)) );
+		return Math.max(0, x); //relu
 	},
 	derivative: function(y){
 		// here the y, is already passed through activation(x).
 		//Works well for the Sigmoid.
-		return (y * (1-y));
+		//return (y * (1-y));
 
-		//return y<0 ? 0 : 1; //relu
+		return y<0 ? 0 : 1; //relu
 	}
 };
 const brain = new NeuralNetwork(design, options);
