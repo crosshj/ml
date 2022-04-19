@@ -26,15 +26,15 @@ let design = [2,10,5,1];
 let options = {
 	learning_rate: 0.3,
 	activation: function(x){
-		//return (1 / (1 + Math.exp(-x)) );
-		return Math.max(0, x); //relu
+		return (1 / (1 + Math.exp(-x)) );
+		//return Math.max(0, x); //relu
 	},
 	derivative: function(y){
 		// here the y, is already passed through activation(x).
 		//Works well for the Sigmoid.
-		//return (y * (1-y));
+		return (y * (1-y));
 
-		return y<0 ? 0 : 1; //relu
+		//return y<0 ? 0 : 1; //relu
 	}
 };
 const brain = new NeuralNetwork(design, options);
@@ -81,7 +81,51 @@ for (const i of Array(MAX_IT).keys()) {
 	LOG && trace.y.push(epochError);
 }
 
-console.log(brain.view())
+const Table = (cols, data) => {
+	// const span = document.createElement('span');
+	// span.textContent = label;
+	// document.body.append(span);
+	const table = document.createElement('table');
+	table.style.border = '1px solid currentColor';
+	
+	const th = document.createElement('tr');
+	for(var c of cols){
+		const td = document.createElement('td');
+		td.textContent = c;
+		if(c === "weights"){
+			td.setAttribute('colspan', '100%');
+		}
+		th.append(td);
+	}
+	table.append(th);
+	
+	for(var row of data){
+		const tr = document.createElement('tr');
+		tr.style.border = '1px solid currentColor'
+		for(var col of row){
+			const td = document.createElement('td');
+			td.textContent = col.toFixed(3);
+			tr.append(td);
+		}
+		table.append(tr);
+	}
+	document.body.append(table)
+}
+
+const NetworkView = (data) => {
+	for(var layer of data){
+		const { bias, weights } = layer;
+		console.log({ bias, weights });
+		let rows = [];
+		for(var [i,b] of bias.entries()){
+			rows.push([...b, ...weights[i],]);
+		}
+		Table(['bias', 'weights'],rows);
+	}
+}
+
+NetworkView(brain.view());
+
 
 const mainColor = '#999';
 const colors = {
