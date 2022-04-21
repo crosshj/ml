@@ -18,6 +18,32 @@
 		<script src="//cdn.muicss.com/mui-0.10.3/js/mui.min.js"></script>
 		-->
 	</head>
+	
+	<style>
+		body { font-family: sans-serif; font-size: 1.5vmin; }
+		ul { list-style: none; }
+		a {
+			color: ButtonText;
+			background-color: LinkText;
+			padding: 8px 20px;
+			text-decoration:none;
+			font-weight:bold;
+			border-radius:5px;
+			cursor:pointer;
+			line-height: 3vmin;
+		}
+		a:hover, a:visited:hover {
+			background-color: ButtonText;
+			color: ButtonFace;
+		}
+		a:visited { background-color: VisitedText; }
+
+		@media only screen and (max-width: 1100px) {
+			body { font-size: 7vmin; }
+			a { line-height: 14vmin; }
+		}
+	</style>
+	
 	<body>
 		<div class="mui-container">
 			<div class="mui-panel">
