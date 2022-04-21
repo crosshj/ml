@@ -1,9 +1,9 @@
 window.neuralTriangle = true; //used for testing components
 
 import { appendUrls, htmlToElement, importCSS, Stepper } from './misc.js';
-//import '../../shared.styl';
-import './neural-triangle.styl';
-import { PointAdjuster } from './point-adjuster.js';
+//import { PointAdjuster } from './point-adjuster.js';
+
+console.log('NT: deps loaded')
 
 const notes = () => `
 <pre class="notes">
@@ -35,11 +35,6 @@ By clicking forward into the steps, we see what I would want NN to do.  Todo, I'
 </pre>
 `
 
-const style = () => `
-<style>
-	body{ opacity: 0; overflow: hidden; transition: opacity: 0.3s ease }
-</style>
-`
 const filters = () => { return `
 <svg style="display:none;">
 	<filter id="blue" color-interpolation-filters="sRGB" x="0" y="0" height="100%" width="100%">
@@ -90,8 +85,10 @@ const visuals = () => { return `
 	<div>ERROR</div>
 </div>
 `};
+
+
 const body = [
-	style, filters, visuals, selector, notes
+	filters, visuals, selector, notes
 ].reduce((all, one) => `${all}${one()}`, '');
 document.body.innerHTML = body;
 const prevButton = document.querySelector('.selector .previous')
@@ -212,7 +209,7 @@ class Diff {
 const originalPoints = [[9,9], [5,1], [1,9]]
 const original = new Triangle('original', originalPoints)
 
-const adjuster = new PointAdjuster(original.pixels)
+//const adjuster = new PointAdjuster(original.pixels)
 
 const steps = [
 	[[8,10],[9,3],[0,5]],

@@ -1,3 +1,19 @@
+body{
+	opacity: 0;
+	overflow: hidden;
+	transition: opacity: 0.3s ease;
+	max-width: 66vw;
+	background: #1a1a1a;
+	display: flex;
+	flex-direction: column;
+	margin: auto;
+	font-family: sans-serif;
+}
+body {
+	opacity: 1 !important;
+	overflow: auto !important;
+}
+
 .button {
 	background: grey;
 	color: black;
@@ -81,6 +97,7 @@ body.focused .selector > div {
 	background: #111;
 	padding: 1.5em;
 	font-size: 1em;
+	white-space: pre-wrap;
 }
 .notes-links {
 	display: inline-flex;
@@ -96,10 +113,4 @@ body.focused .selector > div {
 .canvas-overlay {
 	height: 100%;
 	width: 100%;
-}
-
-
-body {
-	opacity: 1 !important;
-	overflow: auto !important;
 }
