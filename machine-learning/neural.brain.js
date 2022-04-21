@@ -73,6 +73,8 @@ const deps = [
 			[2,1]
 		],
 	];
+	console.log('Training Data:');
+	console.log(JSON.stringify(trainingData))
 
 	net.train(trainingData, { log: false, errorThresh: 0.09 });
 
@@ -83,9 +85,9 @@ const deps = [
 		[4, 2],
 	]);
 
+	console.log('next in series (should be 5,1):');
 	console.log(closeToFiveAndOne);
 
-	// now we're cookin' with gas!
 	const forecast = net.forecast(
 		[
 			[1, 5],
@@ -94,5 +96,6 @@ const deps = [
 		10
 	);
 
+	console.log('forecast (should start with 3,3):');
 	console.log(JSON.stringify(forecast, null, 2));
 })()
