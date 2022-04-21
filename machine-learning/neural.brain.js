@@ -1,5 +1,5 @@
 //show-preview
-import { appendUrls, addUrls, consoleHelper, htmlToElement, importCSS, prism } from './misc.js';
+import { appendUrls, addUrls, consoleHelper, htmlToElement, importCSS, prism } from '../shared/misc.js';
 consoleHelper();
 
 /*

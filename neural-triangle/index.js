@@ -1,6 +1,6 @@
 window.neuralTriangle = true; //used for testing components
 
-import { appendUrls, htmlToElement, importCSS, Stepper } from './misc.js';
+import { htmlToElement, Stepper } from '../shared/misc.js';
 //import { PointAdjuster } from './point-adjuster.js';
 
 console.log('NT: deps loaded')
