@@ -52,8 +52,8 @@ krender()
 graphicGpu.destroy();
 // component-level testing
 const test = async () => {
-	const { importCSS:injectStyle, consoleHelper } = await import('../../.tools/misc.mjs');
-	injectStyle('../../shared.styl');
+	const { importCSS:injectStyle, consoleHelper } = await import('../shared/misc.js');
+	//injectStyle('../../shared.styl');
 };
 
 !window.foo && test();
