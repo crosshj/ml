@@ -1,4 +1,4 @@
-import brainJs from 'https://cdn.skypack.dev/brain.js';
+import brain from 'https://cdn.skypack.dev/brain.js';
 
 /*
 

@@ -1,9 +1,9 @@
 window.neuralTriangle = true; //used for testing components
 
-import { appendUrls, htmlToElement, importCSS, Stepper } from '../../.tools/misc.mjs';
-import '../../shared.styl';
+import { appendUrls, htmlToElement, importCSS, Stepper } from './misc.js';
+//import '../../shared.styl';
 import './neural-triangle.styl';
-import { PointAdjuster } from './point-adjuster.js'
+import { PointAdjuster } from './point-adjuster.js';
 
 const notes = () => `
 <pre class="notes">

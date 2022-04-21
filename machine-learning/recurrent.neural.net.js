@@ -1,5 +1,5 @@
 import { appendUrls, addUrls, consoleHelper, htmlToElement, importCSS } from '../.tools/misc.mjs';
-import '../shared.styl';
+//import '../shared.styl';
 consoleHelper();
 
 /*
