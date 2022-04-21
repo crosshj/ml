@@ -66,10 +66,12 @@
       color: #00BCD4;
     }
 
+	/*
     @media screen and (orientation: portrait) and (min-height: 650px) and (max-height: 985px) {
       #canvas-container { display: none; }
       #rotateMessage { display: block; }
     }
+	*/
 
     #canvas-container canvas {
       zoom: ${5*dimensions.zoom};
@@ -99,12 +101,14 @@
       }
     }
 
+	/*
     @media screen and (max-width: 750px)
     and (orientation: landscape) and (max-height: 450px) {
       #canvas-container canvas{
         zoom: ${2.5*dimensions.zoom};
       }
     }
+		*/
 
     @media screen and (max-width: 500px) {
       #canvas-container canvas{
