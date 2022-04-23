@@ -1,0 +1,15 @@
+#error {
+    color: white;
+    position: absolute;
+    left: calc(85vw + 1em);
+    bottom: 8px;
+    font-size: 2em;
+}
+
+#iterations {
+    color: white;
+    position: absolute;
+    left: calc(85vw + 1em);
+    bottom: calc(8px + 1em);
+    font-size: 2em;
+}

@@ -17,7 +17,8 @@
 		imageObj.onload = function() {
 			ctx.drawImage(imageObj, 0, 0);
 		};
-		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/Lenna.png';
+		// imageObj.src = 'https://crosshj.com/sandbox/src/canvas/Lenna.png';
+		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/lenna3.png';
 	}
 
 	function vader(setter){
@@ -29,7 +30,8 @@
 		imageObj.onload = function() {
 			ctx.drawImage(imageObj, 0, 0);
 		};
-		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/vader.png';
+		// imageObj.src = 'https://crosshj.com/sandbox/src/canvas/vader.png';
+		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/vader2.png';
 	}
 
 	var randomImageData;
@@ -55,7 +57,8 @@
 					//_color.r = Math.round(Math.random()) * 255;
 					//_color.b = Math.round(Math.random()) * 255;
 
-					_color.g = Math.round(Math.random()) * 255;
+					_color.g = Math.round(Math.random() * 255);
+					// _color.g += Math.round(Math.random() * 128) -64;
 					setter(_color, {x, y, xmax});
 				});
 			});

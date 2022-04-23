@@ -1,96 +1,96 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Neural - Apple</title>
-    <link rel="icon" href="../shared/favicon.ico?v=0" />
-    <script src="../shared/canvas_plus.js"></script>
-    <script src="../shared/synaptic.v1.1.4.mod.js"></script>
-    <script src="../shared/pixelOps.js"></script>
-    <script src="../shared/canvasOps.js"></script>
-    <script src="index.js"></script>
-  </head>
-  <body>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>neural</title>
+		<link rel="icon" href="../shared/favicon.ico?v=0" />
+		<script src="../shared/canvas_plus.js"></script>
+		<script src="../shared/synaptic.v1.1.4.mod.js"></script>
+		<script src="../shared/pixelOps.js"></script>
+		<script src="../shared/canvasOps.js"></script>
+		<script src="index.js"></script>
+	<link rel="stylesheet" href="./index.css">
+	</head>
+	<body>
 <!--     <a href="https://github.com/crosshj/sandbox/tree/gh-pages/src/neural-apple">
-      <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png">
-    </a> -->
-    <div class="svg-container" style="visibility: hidden; height: 0px">
-      <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 160 120">
-        <filter id="myFilter">
+			<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/52760788cde945287fbb584134c4cbc2bc36f904/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png">
+		</a> -->
+		<div class="svg-container" style="visibility: hidden; height: 0px">
+			<svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 160 120">
+				<filter id="myFilter">
 <!--           <feComponentTransfer>
-            <feFuncR type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
-            <feFuncG type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
-            <feFuncB type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
-          </feComponentTransfer>
+						<feFuncR type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
+						<feFuncG type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
+						<feFuncB type="gamma" exponent="0.8" amplitude="1.2" offset="0.1" />
+					</feComponentTransfer>
  -->
 <!--           <feColorMatrix type="saturate" values="0.35" result="desat"/>
  -->
 <!--           <feComponentTransfer>
-            <feFuncR type="discrete" tableValues="0 0.25 0.5 0.75 1" />
-            <feFuncG type="discrete" tableValues="0 0.25 0.5 0.75 1" />
-            <feFuncB type="discrete" tableValues="0 0.25 0.5 0.75 1" />
-          </feComponentTransfer> -->
+						<feFuncR type="discrete" tableValues="0 0.25 0.5 0.75 1" />
+						<feFuncG type="discrete" tableValues="0 0.25 0.5 0.75 1" />
+						<feFuncB type="discrete" tableValues="0 0.25 0.5 0.75 1" />
+					</feComponentTransfer> -->
 <!--           <feColorMatrix type="matrix"
-            values="0 0 0 0 0
-                    0 1 0 0 0
-                    0 0 0 0 0
-                    0 0 0 1 0"
-          /> -->
+						values="0 0 0 0 0
+										0 1 0 0 0
+										0 0 0 0 0
+										0 0 0 1 0"
+					/> -->
 
-          <!-- <feMorphology operator="dilate" radius="1"/> -->
+					<!-- <feMorphology operator="dilate" radius="1"/> -->
 <!--           <feGaussianBlur in="SourceGraphic" stdDeviation="1" /> -->
 <!--           <feConvolveMatrix
-            kernelMatrix="1 0 0
-                          0 0 0
-                          0 0 -1"
-          /> -->
+						kernelMatrix="1 0 0
+													0 0 0
+													0 0 -1"
+					/> -->
 <!--           <feComponentTransfer in="blur">
-            <feFuncG type="linear" slope="-15" intercept="8"></feFuncG>
-          </feComponentTransfer> -->
+						<feFuncG type="linear" slope="-15" intercept="8"></feFuncG>
+					</feComponentTransfer> -->
 
-          <feGaussianBlur in="SourceGraphic" result="fi" stdDeviation=".75" edgeMode="duplicate"></feGaussianBlur>
+					<feGaussianBlur in="SourceGraphic" result="fi" stdDeviation=".75" edgeMode="duplicate"></feGaussianBlur>
 <!--           <feGaussianBlur in="SourceGraphic" result="fo" stdDeviation="2" edgeMode="duplicate"></feGaussianBlur>
-          <feGaussianBlur in="SourceGraphic" result="fe" stdDeviation="5" edgeMode="duplicate"></feGaussianBlur> -->
-          <feFlood result="fie" flood-color="black" flood-opacity="1" x="0" y="0" width="100%" height="100%" />
+					<feGaussianBlur in="SourceGraphic" result="fe" stdDeviation="5" edgeMode="duplicate"></feGaussianBlur> -->
+					<feFlood result="fie" flood-color="black" flood-opacity="1" x="0" y="0" width="100%" height="100%" />
 
-          <feComposite in="fi" in2="fie" operator="atop" result="mask" />
+					<feComposite in="fi" in2="fie" operator="atop" result="mask" />
 
-          <feComponentTransfer in="mask" result="woo">
-              <feFuncR type="discrete" tableValues="0 1"/>
-              <feFuncG type="discrete" tableValues="0 1"/>
-              <feFuncB type="discrete" tableValues="0 1 "/>
-          </feComponentTransfer>
+					<feComponentTransfer in="mask" result="woo">
+							<feFuncR type="discrete" tableValues="0 1"/>
+							<feFuncG type="discrete" tableValues="0 1"/>
+							<feFuncB type="discrete" tableValues="0 1 "/>
+					</feComponentTransfer>
 
-          <feColorMatrix type="matrix"
-            in="woo" result="wow"
-            values="0 0 0 0 0
-                    0 -1 0 0 1
-                    0 0 0 0 0
-                    0 0 0 1 0"
-          />
-          <feColorMatrix type="matrix"
-            in="wow" result="wee"
-            values="-1 0 0 0 .8
-                    0 -1 0 0 .1
-                    0 0 -1 0 .15
-                    0 -1 0 1 0"
-          />
+					<feColorMatrix type="matrix"
+						in="woo" result="wow"
+						values="0 0 0 0 0
+										0 -1 0 0 1
+										0 0 0 0 0
+										0 0 0 1 0"
+					/>
+					<feColorMatrix type="matrix"
+						in="wow" result="wee"
+						values="-1 0 0 0 .8
+										0 -1 0 0 .1
+										0 0 -1 0 .15
+										0 -1 0 1 0"
+					/>
 
-          <feColorMatrix type="matrix"
-            in="SourceGraphic" result="gee"
-            values="0 .2 0 0 0
-                    0 0 0 0 0
-                    0 1 0 0 0
-                    0 0 0 1 0"
-          />
+					<feColorMatrix type="matrix"
+						in="SourceGraphic" result="gee"
+						values="0 .2 0 0 0
+										0 0 0 0 0
+										0 1 0 0 0
+										0 0 0 1 0"
+					/>
 
-          <!-- <feComposite in2="wee" in="SourceGraphic" operator="atop"/> -->
-          <feBlend id="feBland" in="gee" in2="wee" mode="screen"/>
+					<!-- <feComposite in2="wee" in="SourceGraphic" operator="atop"/> -->
+					<feBlend id="feBland" in="gee" in2="wee" mode="screen"/>
 
-        </filter>
-      </svg>
-    <div>
-
-  </body>
+				</filter>
+			</svg>
+		<div>
+	</body>
 </html>
