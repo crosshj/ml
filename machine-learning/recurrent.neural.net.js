@@ -1,4 +1,4 @@
-import { appendUrls, addUrls, consoleHelper, htmlToElement, importCSS } from '../.tools/misc.mjs';
+import { appendUrls, addUrls, consoleHelper, htmlToElement, importCSS } from '../shared/misc.js';
 //import '../shared.styl';
 consoleHelper();
 
