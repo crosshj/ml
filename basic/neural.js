@@ -8,15 +8,24 @@ function shuffle(array) {
 	return array;
 }
 
-const normalize = (n) => n/40;
-const deNormal = (n) => Math.round((n*40).toFixed(1));
+// const normalize = (n) => n/40;
+// const deNormal = (n) => n*40;
+// const DATA = [
+// 	{ input: [2.0, 1.0], output: [6.0] },
+// 	{ input: [5.0, 1.0], output: [8.0] },
+// 	{ input: [7.0, 4.0], output: [12.0] },
+// 	{ input: [9.0, 4.0], output: [15.0] },
+// 	{ input: [12.0, 5.0], output: [19.0] },
+// ];
 
-const DATA = [
-	{ input: [2.0, 1.0], output: [6.0] },
-	{ input: [5.0, 1.0], output: [8.0] },
-	{ input: [7.0, 4.0], output: [12.0] },
-	{ input: [9.0, 4.0], output: [15.0] },
-	{ input: [12.0, 5.0], output: [19.0] },
+//XOR
+const normalize = (n) => n;
+const deNormal = (n) => n;
+const DATA = [ 
+	{ input: [0, 1],output: [1] },
+	{ input: [1, 0], output: [1] },
+	{ input: [0, 0],output: [0] },
+	{ input: [1, 1],output: [0] }
 ];
 
 let design = [2,10,5,1];
@@ -66,13 +75,14 @@ for (const i of Array(MAX_IT).keys()) {
 			input.map(normalize),
 			output.map(normalize)
 		);
-		prediction = deNormal(prediction);
-		const err = output - prediction; //error(prediction, output);
+		//prediction = deNormal(prediction);
+		const err = normalize(output) - prediction; //error(prediction, output);
+		//const err = error(prediction, normalize(output))
 		LOG && traceX[j].x.push(i);
 		LOG && traceX[j].y.push(err);
 		errors += err
 
-		i==(MAX_IT-1) && console.log({ prediction, expected: output[0] })
+		i==(MAX_IT-1) && console.log({ prediction: deNormal(prediction), expected: output[0] })
 	}
 	const epochError = errors / DATA.length
 	i==(MAX_IT-1) && console.log(`epoch ${i + 1}`)
@@ -139,7 +149,13 @@ Plotly.newPlot('graph', [...traceX, trace ], {
 	plot_bgcolor: "rgba(0,0,0,0)",
 	paper_bgcolor: "rgba(0,0,0,0)",
 	color: mainColor,
-	yaxis: colors,
+	yaxis: {
+		...colors,
+		range: [-1, 1],
+	},
 	xaxis: colors,
-	legend: colors.legend
+	legend: colors.legend,
+	scene: {
+		aspectratio: {x: 1, y: 2, z: 1}
+	}
 });
