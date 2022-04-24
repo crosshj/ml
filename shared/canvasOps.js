@@ -33,6 +33,18 @@
 		// imageObj.src = 'https://crosshj.com/sandbox/src/canvas/vader.png';
 		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/vader2.png';
 	}
+	
+	function nnTest1(setter){
+		if (!setter) return;
+		var ctx = this.canvas.getContext('2d');
+		var imageObj = new Image();
+		imageObj.setAttribute('crossOrigin', 'Anonymous');
+
+		imageObj.onload = function() {
+			ctx.drawImage(imageObj, 0, 0);
+		};
+		imageObj.src = 'https://crosshj.com/sandbox/src/canvas/nn_test_1.png';
+	}
 
 	var randomImageData;
 	function random(setter){
@@ -80,6 +92,7 @@
 	window.canvasOps = {
 		lenna,
 		vader,
+		nnTest1,
 		random
 	};
 })(window)
