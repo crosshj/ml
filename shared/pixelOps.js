@@ -93,6 +93,17 @@
 		return balance;
 	}
 
+	function setImageDataPixel(imageData, {r=0, g=0, b=0, a=255}, {x=0, y=0, xmax=1}){
+		const ad = imageData.data;
+		const rowOffset = y * 4 * xmax;
+		const colOffset = x * 4;
+		const offset = rowOffset + colOffset;
+		ad[offset + 0]   = r;
+		ad[offset + 1]   = g;
+		ad[offset + 2]   = b;
+		ad[offset + 3]   = a;
+	}
+
 	window.pixelOps = {
 		clone,
 		range,
@@ -103,7 +114,8 @@
 		getXBeforeBalance,
 		getYBeforeBalance,
 		getLeftUpDiagBalance,
-		getRightUpDiagBalance
+		getRightUpDiagBalance,
+		setImageDataPixel
 	};
 
 })(window)

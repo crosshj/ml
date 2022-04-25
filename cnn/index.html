@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>cnn</title>
+		<meta charset="utf-8">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="color-scheme" content="dark light">
+
+		<link rel="icon" href="../shared/favicon.ico" />
+
+		<script src="../shared/synaptic.v1.1.4.mod.js"></script>
+		<script src="../shared/pixelOps.js"></script>
+
+		<link rel="stylesheet" href="index.css">
+		<script src="index.js" type="module"></script>
+	</head>
+	<body>
+		<div class="background"><div id="bg-image"></div></div>
+		<div class="container">
+			<div class="canvas-container">
+				<canvas id="canvas1" width="160" height="120"></canvas>
+				<canvas id="canvas-overlay" width="160" height="120"></canvas>
+			</div>
+			<div class="controls">
+				<select name="image" id="image-selector"></select>
+				<button id="refresh">refresh</button>
+				<button id="run">RUN</button>
+			</div>
+			<pre>
+goals:
+	- better platform for NN exploration
+	- explore convolutional nn's
+todo:
+	- convolution layer(s) [manual at first]
+	- convolution layer(s) framework later]
+	- connect convolution to ANN
+	- visualize output and in-progress processes
+			</pre>
+		</div>
+	</body>
+</html>

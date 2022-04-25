@@ -1,3 +1,5 @@
+import canvasOps from '../shared/canvasOps.js';
+
 /*
 http://cs.stanford.edu/people/karpathy/convnetjs/
 
@@ -39,13 +41,6 @@ const {
 	getLeftUpDiagBalance,
 	getRightUpDiagBalance
 } = pixelOps;
-
-const {
-	lenna,
-	vader,
-	nnTest1,
-	random
-} = canvasOps;
 
 function getInputs(id, x, y, xmax, ymax){
 	//position metrics
@@ -185,11 +180,18 @@ function neuralize(setter){
 	tasksArray[task](taskCallback);
 }
 
-function filter(setter){
+function filter(){
 	this.canvas.style.filter = this.canvas.style.filter
 		? ''
 		: 'url(#myFilter)';
 }
+
+const {
+	lenna,
+	vader,
+	nnTest1,
+	random
+} = canvasOps;
 
 var buttons = [{
 	text: 'random',
