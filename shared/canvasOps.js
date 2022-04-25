@@ -147,6 +147,14 @@ function paint5(){
 	imageObj.src = 'https://crosshj.com/sandbox/src/canvas/paint5.png';
 	return imageObj;
 }
+function wave1(){
+	const ctx = this.canvas.getContext('2d');
+	const imageObj = new Image();
+	imageObj.setAttribute('crossOrigin', 'Anonymous');
+	imageObj.onload = function() { ctx.drawImage(imageObj, 0, 0); };
+	imageObj.src = 'https://crosshj.com/sandbox/src/canvas/wave1.png';
+	return imageObj;
+}
 
 const canvasOps = {
 	frog,
@@ -160,6 +168,7 @@ const canvasOps = {
 	paint5,
 	random,
 	vader,
+	wave1
 };
 window.canvasOps = canvasOps;
 
