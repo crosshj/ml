@@ -1,11 +1,8 @@
 import '../shared/components/container.js';
 const {Architect, Trainer} = synaptic;
-
 const NeuralContainer = document.querySelector('neural-container');
-NeuralContainer.onLoad(() => {
-	//NeuralContainer.changeImage('frog');
-});
-NeuralContainer.setNotes(`
+
+const notes = `
 overall goals:
 	- better platform for NN exploration
 	- explore convolutional nn's
@@ -20,7 +17,8 @@ container todo:
 	- better lifecycle
 	- loading screens
 	- better external interface
-`.replace(/\t/g, '   '));
+`;
+
 
 const tOptions = {
 	rate: .01,
@@ -39,5 +37,8 @@ var gates = 10;
 const liqNetOptions = [input, pool, output, connections, gates];
 const netOptions = [20, 21, 1];
 
-function ready(){}
-document.addEventListener('DOMContentLoaded', ready, false);
+
+NeuralContainer.onLoad(() => {
+	//NeuralContainer.changeImage('frog');
+});
+NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
