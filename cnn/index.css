@@ -88,6 +88,7 @@ select:focus, select:active {
 
 pre {
 	white-space: pre-wrap;
+	padding: 0.5em;
 }
 @media only screen and (max-width: 600px) {
 	pre {
