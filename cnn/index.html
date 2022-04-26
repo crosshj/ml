@@ -9,28 +9,31 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="color-scheme" content="dark light">
 
-		<link rel="icon" href="../shared/favicon.svg" />
+		<link rel="icon" href="../shared/favicon.svg">
 
 		<script src="../shared/synaptic.v1.1.4.mod.js"></script>
-		<script src="../shared/pixelOps.js"></script>
 
 		<link rel="stylesheet" href="index.css">
+		<script src="../shared/components/container.js" type="module"></script>
 		<script src="index.js" type="module"></script>
-		<script src="../shared/components/modal.js"></script>
 	</head>
 	<body>
-		<div class="background"><div id="bg-image"></div></div>
-		<div class="container">
-			<div class="canvas-container">
-				<canvas id="canvas1" width="160" height="120"></canvas>
-				<canvas id="canvas-overlay" width="480" height="360"></canvas>
-			</div>
-			<div class="controls">
-				<select name="image" id="image-selector"></select>
-				<button id="refresh">refresh</button>
-				<button id="run">RUN</button>
-			</div>
-			<pre>
+		<neural-container x="10" y="10" width="160" height="120">
+			<images slot="images">
+				<img name="Cool Frog" value="frog" src="https://crosshj.com/sandbox/src/canvas/frog.png">
+				<img name="Samurai Horse" value="horse" src="https://crosshj.com/sandbox/src/canvas/horse.png">
+				<img name="Soderberg Ankle" value="lenna" src="https://crosshj.com/sandbox/src/canvas/lenna3.png">
+				<img name="NN Test Image" value="nnTest1">
+				<img name="Paint: Orange" value="paint1">
+				<img name="Paint: Old" value="paint2">
+				<img name="Paint: Dark Colors" value="paint3">
+				<img name="Paint: Pink" value="paint4">
+				<img name="Paint: Pastel" value="paint5">
+				<img name="Random Pixels" value="random">
+				<img name="Darth Vader" value="vader">
+				<img name="Japanese Wave" value="wave1">
+			</images>
+			<pre slot="notes">
 goals:
 	- better platform for NN exploration
 	- explore convolutional nn's
@@ -40,13 +43,7 @@ todo:
 	- connect convolution to ANN
 	- visualize output and in-progress processes
 			</pre>
-				<pp-modal>
-					<h1 slot="header">Information Box</h1>
-					<span id="foo">
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-					aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-					</span>
-				</pp-modal>
-		</div>
+		</neural-container>
+
 	</body>
 </html>

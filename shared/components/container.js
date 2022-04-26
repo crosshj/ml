@@ -217,7 +217,9 @@ function ready(){
 	});
 
 	imageSelector.innerHTML = imageOptions //Object.keys(canvasOps)
-		.map(SelectOption).join('\n');
+		.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()) )
+		.map(SelectOption)
+		.join('\n');
 	imageSelector.value = sessionStorage.getItem('neural-net-image') ||
 		Object.keys(canvasOps)[0];
 	imageSelector.onchange = () => {
