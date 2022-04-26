@@ -76,8 +76,8 @@ function ShowOverlayBlock(x,y){
 	// ctx.rect(x*10, y*10, 10, 10);
 	// ctx.fillStyle = "rgba(0, 255, 195, 0.5)"
 	// ctx.fill();
-	ctx.strokeStyle = "rgba(0, 255, 195, 0.75)";
-	ctx.strokeRect((x*10)-0.5, (y*10)-0.5, 11, 11);
+	ctx.strokeStyle = "rgba(0, 255, 195, 1)";
+	ctx.strokeRect((x*30)-0.5, (y*30)-0.5, 31, 31);
 }
 
 function setBodyBack(image){
@@ -100,8 +100,8 @@ function setBodyBack(image){
 // 	const y = Math.floor((e.clientY - rect.top) * scaleY);
 
 // 	ShowOverlayBlock(
-// 		Math.floor(x/10),
-// 		Math.floor(y/10)
+// 		Math.floor(x/30),
+// 		Math.floor(y/30)
 // 	);
 // };
 

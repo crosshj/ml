@@ -9,20 +9,21 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="color-scheme" content="dark light">
 
-		<link rel="icon" href="../shared/favicon.ico" />
+		<link rel="icon" href="../shared/favicon.svg" />
 
 		<script src="../shared/synaptic.v1.1.4.mod.js"></script>
 		<script src="../shared/pixelOps.js"></script>
 
 		<link rel="stylesheet" href="index.css">
 		<script src="index.js" type="module"></script>
+		<script src="../shared/components/modal.js"></script>
 	</head>
 	<body>
 		<div class="background"><div id="bg-image"></div></div>
 		<div class="container">
 			<div class="canvas-container">
 				<canvas id="canvas1" width="160" height="120"></canvas>
-				<canvas id="canvas-overlay" width="160" height="120"></canvas>
+				<canvas id="canvas-overlay" width="480" height="360"></canvas>
 			</div>
 			<div class="controls">
 				<select name="image" id="image-selector"></select>
@@ -39,6 +40,13 @@ todo:
 	- connect convolution to ANN
 	- visualize output and in-progress processes
 			</pre>
+				<pp-modal>
+					<h1 slot="header">Information Box</h1>
+					<span id="foo">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+					aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+					</span>
+				</pp-modal>
 		</div>
 	</body>
 </html>
