@@ -1,4 +1,26 @@
+import '../shared/components/container.js';
 const {Architect, Trainer} = synaptic;
+
+const NeuralContainer = document.querySelector('neural-container');
+NeuralContainer.onLoad(() => {
+	//NeuralContainer.changeImage('frog');
+});
+NeuralContainer.setNotes(`
+overall goals:
+	- better platform for NN exploration
+	- explore convolutional nn's
+
+overall todo:
+	- convolution layer(s) [manual at first]
+	- convolution layer(s) framework later]
+	- connect convolution to ANN
+	- visualize output and in-progress processes
+
+container todo:
+	- better lifecycle
+	- loading screens
+	- better external interface
+`.replace(/\t/g, '   '));
 
 const tOptions = {
 	rate: .01,

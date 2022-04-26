@@ -16,33 +16,21 @@ const {
 	setImageDataPixel
 } = pixelOps;
 
-/*
-
-create a common component which does most of the work of setting up
-
-
-
-<neural-container
-	x="10"
-	y="10"
-	width="160"
-	height="120"
->
-	<img src="./example1.png"></img>
-	<img src="./example2.png"></img>
-	<img src="./example3.png"></img>
-	<img src="./example4.png"></img>
-</neural-container>
-
-
-this would create a basic experiment page like seen in cnn/index.html
-
-the javascript to support this page would then be focused only on network
-
-would be even nicer if this component could expose methods for traversing pixels with read/write ops
-
-
-*/
+var outerStyleSheet = document.createElement('style');
+outerStyleSheet.id = 'neural-container-style';
+document.head.appendChild(outerStyleSheet);
+outerStyleSheet.sheet.insertRule(`
+	neural-container {
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		right: 0;
+	}
+`, 0);
+outerStyleSheet.sheet.insertRule(`
+	body { overflow: hidden; }
+`, 1);
 
 const style = `
 
@@ -57,6 +45,9 @@ const style = `
 	background-color: transparent;
 	margin: -20px -20px -20px -20px;
 	z-index: -1;
+}
+@media only screen and (max-width: 600px) {
+	#bg-image { display: none; }
 }
 .container {
 	height: 100vh;
@@ -138,13 +129,15 @@ select:focus, select:active {
 	box-shadow: 0 1px 0 0 black;
 }
 
-::slotted(pre) {
+::slotted(pre), pre {
 	white-space: pre-wrap;
-	padding: 0.5em;
+	padding: 2em;
+	margin: 0;
 }
 @media only screen and (max-width: 600px) {
-	::slotted(pre) {
+	::slotted(pre), pre {
 		font-size: .8em;
+		padding: 0.5em;
 	}
 }
 `.trim();
@@ -204,8 +197,9 @@ function setBodyBack(image){
 // };
 
 function ready(){
-	const { imageSelector, refreshButton, runButton, inputImages } = this;
-	const _changeImage = changeImage.bind(this);
+	const {
+		imageSelector, refreshButton, runButton, inputImages, changeImage
+	} = this;
 	const _setBodyBack = setBodyBack.bind(this);
 	const _ShowOverlayBlock = ShowOverlayBlock.bind(this);
 	
@@ -224,12 +218,12 @@ function ready(){
 		Object.keys(canvasOps)[0];
 	imageSelector.onchange = () => {
 		sessionStorage.setItem('neural-net-image', imageSelector.value)
-		const image = _changeImage(imageSelector.value);
+		const image = changeImage(imageSelector.value);
 		_setBodyBack(image);
 	}
 	refreshButton.onclick = () => {
 		_ShowOverlayBlock();
-		_changeImage(imageSelector.value);
+		changeImage(imageSelector.value);
 	}
 	runButton.onclick = async () => {
 		for(var [x] of new Array(16).entries()){
@@ -275,11 +269,26 @@ class Container extends HTMLElement {
 		this.runButton = this.shadowRoot.querySelector('#run');
 		this.overlayCtx = this.canvasOverlay.getContext("2d");
 		this.imagesSlot = this.shadowRoot.querySelector('slot[name="images"]');
+		this.notesSlot = this.shadowRoot.querySelector('slot[name="notes"]');
 		this.inputImages = Array.from(this.imagesSlot.assignedElements({flatten: true})?.[0]?.children);
+		
+		this.changeImage = changeImage.bind(this);
 		ready.bind(this)();
+		this.connected = true;
+		console.log('connected');
 	}
 	disconnectedCallback() {
-		
+		this.connected = false;
+	}
+	onLoad(handler){
+		//handler();
+		//console.log('onload');
+		// add listener + optionally trigger said listener if already connected
+	}
+	setNotes(text){
+		this.notesSlot.innerHTML = `<pre>${text.trim()}</pre>`;
 	}
 }
 customElements.define('neural-container', Container);
+
+export default {};
