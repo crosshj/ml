@@ -14,7 +14,7 @@
 	</head>
 	<body>
 		<neural-container x="10" y="10" width="160" height="120">
-			<images slot="images">
+			<images slot="images" style="display:none;">
 				<img name="Cool Frog" value="frog" src="https://crosshj.com/sandbox/src/canvas/frog.png">
 				<img name="Samurai Horse" value="horse" src="https://crosshj.com/sandbox/src/canvas/horse.png">
 				<img name="Soderberg Ankle" value="lenna" src="https://crosshj.com/sandbox/src/canvas/lenna3.png">
@@ -28,6 +28,21 @@
 				<img name="Darth Vader" value="vader">
 				<img name="Japanese Wave" value="wave1">
 			</images>
+			<functions slot="functions">
+				<!--
+				<function name="Convolution" event="net-convo"></function>
+				<function name="Reconstitute" event="net-reconst"></function>
+				-->
+				<function name="Dry Run" event="dryRun"></function>
+				<function name="Mean Remove" event="mean"></function>
+				<function name="Sharpen" event="sharpen"></function>
+				<function name="Blur" event="blur"></function>
+				<function name="Emboss" event="emboss"></function>
+				<function name="Emboss Subtle" event="embossSubtle"></function>
+				<function name="Edge Detect" event="edgeDetect"></function>
+				<function name="Edge Detect 2" event="edgeDetect2"></function>
+				<function name="Dunno 5x5" event="dunno"></function>
+			</functions>
 		</neural-container>
 	</body>
 </html>

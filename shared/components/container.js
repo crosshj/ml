@@ -20,19 +20,25 @@ var outerStyleSheet = document.createElement('style');
 outerStyleSheet.id = 'neural-container-style';
 document.head.appendChild(outerStyleSheet);
 outerStyleSheet.sheet.insertRule(`
-	neural-container {
-		position: absolute;
-		left: 0;
-		top: 0;
-		bottom: 0;
-		right: 0;
-	}
-`, 0);
-outerStyleSheet.sheet.insertRule(`
 	body { overflow: hidden; }
-`, 1);
+`, 0);
 
 const style = `
+:host {
+	position: absolute;
+	left: 0; top: 0; bottom: 0; right: 0;
+}
+
+.hidden { display: none; }
+
+.background,
+.container {
+	visibility: visible;
+}
+.background.loading,
+.container.loading {
+	visibility: hidden;
+}
 
 #bg-image {
 	position: absolute;
@@ -58,6 +64,7 @@ const style = `
 	display: flex;
 	flex-direction: column;
 }
+
 @media only screen and (min-width: 1100px) {
 	.container {
 		max-width: 900px;
@@ -99,6 +106,7 @@ select:focus, select:active {
 	font-size: 1.1em;
 	display: flex;
 	justify-content: flex-end;
+	user-select: none;
 }
 @media only screen and (max-width: 600px) {
 	.controls { font-size: 0.75em; }
@@ -128,6 +136,9 @@ select:focus, select:active {
 	color: white;
 	box-shadow: 0 1px 0 0 black;
 }
+.controls #run {
+	margin-right: auto;
+}
 
 ::slotted(pre), pre {
 	white-space: pre-wrap;
@@ -143,16 +154,6 @@ select:focus, select:active {
 `.trim();
 
 const SelectOption = ({ name, value}) => `<option value="${value}">${name}</option>`
-
-function changeImage(which) {
-	if(!canvasOps[which]) return;
-	const { canvas } = this;
-	const dimensions = {
-		x: 160,
-		y: 120
-	};
-	return canvasOps[which].bind({ canvas, dimensions })(setImageDataPixel);
-}
 
 function ShowOverlayBlock(x,y){
 	const { overlayCtx: ctx, canvasOverlay } = this;
@@ -170,11 +171,12 @@ function ShowOverlayBlock(x,y){
 	ctx.strokeRect((x*30)-0.5, (y*30)-0.5, 31, 31);
 }
 
-function setBodyBack(image){
+function setBodyBack(image, callback){
 	const { canvas, bgImage } = this;
 	const setBg = () => {
 		const imageDataUri = canvas.toDataURL('image/png');
 		bgImage.style.backgroundImage = `url(${imageDataUri})`;
+		callback && callback();
 	};
 	if(!image) return setTimeout(setBg, 1);
 	image.addEventListener('load', setBg);
@@ -196,11 +198,75 @@ function setBodyBack(image){
 // 	);
 // };
 
-function ready(){
-	const {
-		imageSelector, refreshButton, runButton, inputImages, changeImage
-	} = this;
+
+function changeImage(which, callback) {
 	const _setBodyBack = setBodyBack.bind(this);
+	if(!canvasOps[which]) return;
+	//todo: call event to put component in loading state
+	sessionStorage.setItem('neural-net-image', which);
+	const { canvas } = this;
+	const dimensions = {
+		x: 160,
+		y: 120
+	};
+	const image = canvasOps[which].bind({ canvas, dimensions })(setImageDataPixel);
+	_setBodyBack(image, callback);
+}
+
+function trainingSetFromImageData(id, xmax, ymax){
+	var results = [];
+	var max = 0;
+	var min = 255;
+	id.data.forEach((x,i)=>{
+		if(i%4-1===0){ //green
+			if(max < x){ max = x; }
+			if(min > x){ min = x; }
+		}
+	});
+
+	range(0, xmax).forEach((unused_x, x) => {
+		range(0, ymax).forEach((unused_y, y) => {
+			const offset = xmax*y*4 + x*4;
+			results.push({
+				input: getInputs(id, x, y, xmax, ymax),
+				output: [
+					spread(id.data[offset + 1],max,min)/255
+				]
+			});
+
+		});
+	});
+
+	return results;
+}
+
+function readBlock({ x, y, width, height }){
+	const ctx = this.canvas.getContext('2d');;
+	const id = ctx.getImageData(x*width, y*height, width, height);
+	const set = [];
+	// for (var i=0,len=id.data.length; i < len; i+= 4) {
+	// 	set.push({
+	// 		r: id.data[i],
+	// 		g: id.data[i+1],
+	// 		b: id.data[i+2],
+	// 		a: id.data[i+2]
+	// 	})
+	// }
+	return { id, set };
+}
+function writeBlock({x, y, width, height, imageData }){
+	if(!imageData) return;
+	const ctx = this.canvas.getContext('2d');
+	ctx.putImageData(imageData, x*width, y*height);
+}
+
+async function ready(){
+	const {
+		refreshButton, runButton, pauseButton,
+		imageSelector, inputImages, changeImage,
+		functionSelector, inputFunctions, changeFunction,
+		loadedHandlers, loadedCallback
+	} = this;
 	const _ShowOverlayBlock = ShowOverlayBlock.bind(this);
 	
 	const imageOptions = inputImages.map(x => {
@@ -209,31 +275,83 @@ function ready(){
 			value: x.getAttribute('value') || x.name
 		}
 	});
-
-	imageSelector.innerHTML = imageOptions //Object.keys(canvasOps)
+	imageSelector.innerHTML = imageOptions
 		.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()) )
 		.map(SelectOption)
 		.join('\n');
-	imageSelector.value = sessionStorage.getItem('neural-net-image') ||
-		Object.keys(canvasOps)[0];
-	imageSelector.onchange = () => {
-		sessionStorage.setItem('neural-net-image', imageSelector.value)
-		const image = changeImage(imageSelector.value);
-		_setBodyBack(image);
-	}
+	imageSelector.value = sessionStorage.getItem('neural-net-image') || imageOptions[0]?.value;
+	imageSelector.onchange = () => changeImage(imageSelector.value);
+
+	const fnOptions = inputFunctions.map(x => {
+		return {
+			name: x.getAttribute('name') || x.getAttribute('event'),
+			value: x.getAttribute('event') || x.getAttribute('name')
+		}
+	});
+	functionSelector.innerHTML = fnOptions
+		.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()) )
+		.map(SelectOption)
+		.join('\n');
+	functionSelector.value = sessionStorage.getItem('neural-net-fn') || fnOptions[0]?.value;
+	functionSelector.onchange = () => changeFunction(functionSelector.value);
+
 	refreshButton.onclick = () => {
 		_ShowOverlayBlock();
 		changeImage(imageSelector.value);
+		runButton.classList.remove('hidden');
+		pauseButton.classList.add('hidden');
+		this.paused = 'canceled';
 	}
 	runButton.onclick = async () => {
+		runButton.classList.add('hidden');
+		pauseButton.classList.remove('hidden');
+
+		if(this.paused && this.paused.resolve){
+			this.paused.finally(() => {
+				delete this.paused;
+			});
+			this.paused.resolve();
+			return;
+		}
+		if(this.paused && !this.paused.resolve){
+			delete this.paused;
+		}
+		const { currentFunction, functions } = this;
+		if(!functions[currentFunction]){
+			console.log('Function not defined: ' + currentFunction);
+			return;
+		}
 		for(var [x] of new Array(16).entries()){
 			for(var [y] of new Array(12).entries()){
+				if(this.paused){
+					const status = await this.paused;
+					if(status === 'canceled') break;
+				}
 				_ShowOverlayBlock(x,y);
-				await delay(50)
+				const { id } = readBlock.bind(this)({
+					x, y, width: 10, height: 10
+				});
+				const newImgData = await functions[currentFunction]({ x, y, id });
+				writeBlock.bind(this)({
+					x, y, width: 10, height: 10, imageData: newImgData
+				});
 			}
 		}
+		setTimeout(_ShowOverlayBlock, 1000);
+		runButton.classList.remove('hidden');
+		pauseButton.classList.add('hidden');
 	}
-	imageSelector.onchange();
+	pauseButton.onclick = async () => {
+		let pausedResolve;
+		this.paused = new Promise((resolve ) =>{ pausedResolve = resolve; });
+		this.paused.resolve = pausedResolve;
+
+		runButton.classList.remove('hidden');
+		pauseButton.classList.add('hidden');
+	};
+	await changeFunction(functionSelector.value);
+	await changeImage(imageSelector.value);
+	await loadedCallback.bind(this)();
 }
 
 
@@ -242,48 +360,95 @@ class Container extends HTMLElement {
 		super();
 		//this.shadow = this.attachShadow({ mode: 'closed' });
 		this.attachShadow({ mode: 'open' });
+
+		const fontAwesome = document.createElement("link");
+		fontAwesome.rel = "stylesheet";
+		fontAwesome.href = "https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css";
+		document.head.appendChild(fontAwesome);
+
 		this.shadowRoot.innerHTML = `
 		<style>${style}</style>
-		<div class="background"><div id="bg-image"></div></div>
-		<div class="container">
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+		<div class="background loading"><div id="bg-image"></div></div>
+		<div class="container loading">
 			<div class="canvas-container">
 				<canvas id="canvas1" width="160" height="120"></canvas>
 				<canvas id="canvas-overlay" width="480" height="360"></canvas>
 			</div>
 			<div class="controls">
+				<div id="run">
+					<button id="play">
+						<i class="fa fa-play"></i>
+					</button>
+					<button id="pause" class="hidden">
+						<i class="fa fa-pause"></i>
+					</button>
+				</div>
+				<button id="refresh">
+					<i class="fa fa-refresh"></i>
+				</button>
+				<select name="function" id="function-selector"></select>
 				<select name="image" id="image-selector"></select>
-				<button id="refresh">REFRESH</button>
-				<button id="run">RUN</button>
 			</div>
 			<slot name="notes"></slot>
 			<slot name="images"></slot>
+			<slot name="functions"></slot>
 		</div>
 		`
-	}
-	connectedCallback() {
+		this.functions = [];
+		this.loadedHandlers = [];
+		this.container = this.shadowRoot.querySelector('.container');
+		this.background = this.shadowRoot.querySelector('.background');
 		this.bgImage = this.shadowRoot.querySelector('#bg-image');
-		this.imageSelector = this.shadowRoot.querySelector('#image-selector');
 		this.canvas = this.shadowRoot.querySelector('.container #canvas1');
 		this.canvasOverlay = this.shadowRoot.querySelector('.container #canvas-overlay');
-		this.refreshButton = this.shadowRoot.querySelector('#refresh');
-		this.runButton = this.shadowRoot.querySelector('#run');
 		this.overlayCtx = this.canvasOverlay.getContext("2d");
+
+		this.runButton = this.shadowRoot.querySelector('#play');
+		this.pauseButton = this.shadowRoot.querySelector('#pause');
+		this.refreshButton = this.shadowRoot.querySelector('#refresh');
+
+		this.imageSelector = this.shadowRoot.querySelector('#image-selector');
 		this.imagesSlot = this.shadowRoot.querySelector('slot[name="images"]');
-		this.notesSlot = this.shadowRoot.querySelector('slot[name="notes"]');
 		this.inputImages = Array.from(this.imagesSlot.assignedElements({flatten: true})?.[0]?.children);
+
+		this.functionSelector = this.shadowRoot.querySelector('#function-selector');
+		this.functionsSlot = this.shadowRoot.querySelector('slot[name="functions"]');
+		this.inputFunctions = Array.from(this.functionsSlot.assignedElements({flatten: true})?.[0]?.children);
+
+		this.notesSlot = this.shadowRoot.querySelector('slot[name="notes"]');
 		
-		this.changeImage = changeImage.bind(this);
-		ready.bind(this)();
-		this.connected = true;
-		console.log('connected');
+		this.changeImage = async (which) => {
+			this.imageSelector.value = which;
+			await new Promise((resolve) => {
+				changeImage.bind(this)(which, resolve);
+			})
+		};
+		this.changeFunction = async (which) => {
+			sessionStorage.setItem('neural-net-fn', which);
+			this.currentFunction = which;
+		};
+		this.ready = ready.bind(this)();
+	}
+	connectedCallback() {
+
 	}
 	disconnectedCallback() {
-		this.connected = false;
+		this.loaded = false;
+	}
+	async loadedCallback(){
+		const { container, background } = this;
+		for(const handler of this.loadedHandlers){
+			await handler.bind(this)();
+		}
+		this.loaded = true;
+		background.classList.remove('loading');
+		container.classList.remove('loading');
 	}
 	onLoad(handler){
-		//handler();
-		//console.log('onload');
-		// add listener + optionally trigger said listener if already connected
+		this.loadedHandlers.push(handler);
 	}
 	setNotes(text){
 		this.notesSlot.innerHTML = `<pre>${text.trim()}</pre>`;
