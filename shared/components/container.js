@@ -77,6 +77,7 @@ const style = `
 .canvas-container #canvas1 {
 	position: relative;
 	display: flex;
+	background-color: #101010
 }
 .canvas-container canvas {
 	position: absolute;
@@ -332,7 +333,7 @@ async function ready(){
 			}
 		}
 		this.canvasReadOnly = cloneCanvas(this.canvas);
-		setTimeout(_ShowOverlayBlock, 1000);
+		_ShowOverlayBlock();
 		runButton.classList.remove('hidden');
 		pauseButton.classList.add('hidden');
 	}
