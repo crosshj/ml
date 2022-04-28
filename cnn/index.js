@@ -11,15 +11,11 @@ overall goals:
 	- explore convolutional nn's
 
 overall todo:
-	- convolution layer(s) [manual at first]
-	- convolution layer(s) framework later]
 	- connect convolution to ANN
 	- visualize output and in-progress processes
 
 container todo:
-	- better lifecycle
 	- loading screens
-	- better external interface
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
@@ -43,10 +39,9 @@ const netOptions = [20, 21, 1];
 
 const dummyFn = (filter) => {
 	return async (args) => {
-		const { id } = args;
 		if(filter==='dry-run'){
 			await delay(30);
-			return id;
+			return args.id;
 		}
 		// for (var i=0,len=id.data.length; i < len; i+= 4) {
 		// 	id.data[i] = 0;
@@ -55,7 +50,8 @@ const dummyFn = (filter) => {
 		// 	id.data[i+3] = 255;
 		// }
 		//mean removal, sharpen, blur, emboss, emboss subtle, edge detect, edge detect 2
-		const newImageData = convolve(id, filter) || id;
+		//await delay(0);
+		const newImageData = convolve(null, filter, args.readImage) || args.id;
 		return newImageData;
 	};
 };

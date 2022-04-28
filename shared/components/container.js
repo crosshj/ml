@@ -211,53 +211,36 @@ function changeImage(which, callback) {
 	};
 	const image = canvasOps[which].bind({ canvas, dimensions })(setImageDataPixel);
 	_setBodyBack(image, callback);
+	this.canvasReadOnly = undefined;
 }
 
-function trainingSetFromImageData(id, xmax, ymax){
-	var results = [];
-	var max = 0;
-	var min = 255;
-	id.data.forEach((x,i)=>{
-		if(i%4-1===0){ //green
-			if(max < x){ max = x; }
-			if(min > x){ min = x; }
-		}
-	});
-
-	range(0, xmax).forEach((unused_x, x) => {
-		range(0, ymax).forEach((unused_y, y) => {
-			const offset = xmax*y*4 + x*4;
-			results.push({
-				input: getInputs(id, x, y, xmax, ymax),
-				output: [
-					spread(id.data[offset + 1],max,min)/255
-				]
-			});
-
-		});
-	});
-
-	return results;
+function cloneCanvas(oldCanvas) {
+	const newCanvas = document.createElement('canvas');
+	const context = newCanvas.getContext('2d');
+	newCanvas.width = oldCanvas.width;
+	newCanvas.height = oldCanvas.height;
+	context.drawImage(oldCanvas, 0, 0);
+	return newCanvas;
 }
 
-function readBlock({ x, y, width, height }){
-	const ctx = this.canvas.getContext('2d');;
-	const id = ctx.getImageData(x*width, y*height, width, height);
+function readBlock({ x, y, xOffset=0, yOffset=0, width, height }){
+	if(!this.canvasReadOnly){
+		this.canvasReadOnly = cloneCanvas(this.canvas);
+	}
+	const ctx = this.canvasReadOnly.getContext('2d');;
+	const id = ctx.getImageData(x*10+xOffset, y*10+xOffset, width, height);
 	const set = [];
-	// for (var i=0,len=id.data.length; i < len; i+= 4) {
-	// 	set.push({
-	// 		r: id.data[i],
-	// 		g: id.data[i+1],
-	// 		b: id.data[i+2],
-	// 		a: id.data[i+2]
-	// 	})
-	// }
 	return { id, set };
 }
 function writeBlock({x, y, width, height, imageData }){
 	if(!imageData) return;
-	const ctx = this.canvas.getContext('2d');
-	ctx.putImageData(imageData, x*width, y*height);
+	let resolver;
+	window.requestAnimationFrame(() => {
+		const ctx = this.canvas.getContext('2d');
+		ctx.putImageData(imageData, x*width, y*height);
+		resolver();
+	});
+	return new Promise((resolve) => resolver = resolve);
 }
 
 async function ready(){
@@ -322,7 +305,9 @@ async function ready(){
 			return;
 		}
 		for(var [x] of new Array(16).entries()){
+			//if(x===0) continue;
 			for(var [y] of new Array(12).entries()){
+				//if(y===0) continue;
 				if(this.paused){
 					const status = await this.paused;
 					if(status === 'canceled') break;
@@ -331,12 +316,22 @@ async function ready(){
 				const { id } = readBlock.bind(this)({
 					x, y, width: 10, height: 10
 				});
-				const newImgData = await functions[currentFunction]({ x, y, id });
-				writeBlock.bind(this)({
+				const readImage = (offset) => readBlock.bind(this)({
+					x, y,
+					xOffset: offset.x,
+					yOffset: offset.y,
+					width: 10 + (offset.width || 0),
+					height: 10 + (offset.height || 0),
+				});
+				const newImgData = await functions[currentFunction]({
+					x, y, id, readImage
+				});
+				await writeBlock.bind(this)({
 					x, y, width: 10, height: 10, imageData: newImgData
 				});
 			}
 		}
+		this.canvasReadOnly = cloneCanvas(this.canvas);
 		setTimeout(_ShowOverlayBlock, 1000);
 		runButton.classList.remove('hidden');
 		pauseButton.classList.add('hidden');

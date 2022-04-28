@@ -5,14 +5,18 @@ const matrices3x3 = [
 			[-1, -1, -1],
 			[-1,  9, -1],
 			[-1, -1, -1]
-		]
+		],
+		offset: 0,
+		divisor: 1.5
 	}, {
 		name: 'sharpen',
 		data: [
 			[ 0, -2,  0],
 			[-2, 11, -2],
 			[ 0, -2,  0]
-		]
+		],
+		//offset: 50,
+		divisor: 3
 	}, {
 		name: 'blur',
 		data: [
@@ -20,7 +24,8 @@ const matrices3x3 = [
 			[ 2,  4,  2],
 			[ 1,  2,  1]
 		],
-		//offset: -1024,
+		offset: 0,
+		divisor: 16
 	}, {
 		name: 'emboss',
 		data: [
@@ -28,7 +33,8 @@ const matrices3x3 = [
 			[ 0, -1,  0],
 			[ 0,  0, -1]
 		],
-		offset: 127,
+		offset: 80,
+		//divisor: 0.5
 	}, {
 		name: 'emboss subtle',
 		data: [
@@ -36,6 +42,7 @@ const matrices3x3 = [
 			[ 1,  3, -1],
 			[ 1, -1, -1]
 		],
+		divisor: 2.5
 	}, {
 		name: 'edge detect',
 		data:[
@@ -43,6 +50,8 @@ const matrices3x3 = [
 			[ 1, -7,  1],
 			[ 1,  1,  1]
 		],
+		offset: 10,
+		divisor: 1.5
 	}, {
 		name: 'edge detect 2',
 		data: [
@@ -50,6 +59,8 @@ const matrices3x3 = [
 			[ 0,  0,  0],
 			[ 0,  0,  5]
 		],
+		offset: 0,
+		divisor: 2
 	}
 ];
 const matrices5x5 = [
@@ -62,14 +73,33 @@ const matrices5x5 = [
 			[ 0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0],
 		],
-		offset: -255,
+		//offset: -255,
+		divisor: 3.75
 	}
 ];
 const kernels = [...matrices3x3, ...matrices5x5];
 
-function applyFilter(src, kernel, divisor = 1, offset = 0, opaque = true) {
-	var w = src.width;
-	var h = src.height;
+function applyFilter(img, kernel, divisor = 1, offset = 0, opaque = true) {
+	const dim = Math.sqrt(kernel.flat().length);
+	const pad = Math.floor(dim / 2);
+
+	if (dim % 2 !== 1) {
+		console.log('Cannot load kernel!');
+		return;
+	}
+	const imageOffset = {
+		x: -1*pad,
+		y: -1*pad,
+		width: 2*pad,
+		height: 2*pad
+	};
+
+	const { id: src } = typeof img === "function"
+		? img(imageOffset)
+		: { id: img };
+
+	var w = src.width-(2*pad);
+	var h = src.height-(2*pad);
 	var dst = new ImageData(w, h);
 	var dstBuf = dst.data;
 	var srcBuf = src.data;
@@ -78,50 +108,39 @@ function applyFilter(src, kernel, divisor = 1, offset = 0, opaque = true) {
 
 	for (var row = 0; row < h; row++) {
 		for (var col = 0; col < w; col++) {
-			var result = [0, 0, 0, 0];
-			for (var kRow = 0; kRow < kernel.length; kRow++) {
-				for (var kCol = 0; kCol < kernel[kRow].length; kCol++) {
-					var kVal = kernel[kRow][kCol]
-					var pixelRow = row + kRow - rowOffset;
-					var pixelCol = col + kCol - colOffset;
 
-					if (pixelRow < 0 || pixelRow >= h ||
-						pixelCol < 0 || pixelCol >= w
-					) {
-						continue;
-					}
+			const dstIndex = (row * w + col) * 4;
+			const srcIndex = ((pad+row) * src.width + (pad+col)) * 4;
 
-					var srcIndex = (pixelRow * w + pixelCol) * 4;
-					for (var channel = 0; channel < 4; channel++) {
-						if (opaque && channel === 3) {
-							continue;
-						} else {
-							var pixel = srcBuf[srcIndex + channel];
-							result[channel] += pixel * kVal;
-						}
+			for (var channel = 0; channel < 4; channel++) {
+				if(channel === 3){
+					dstBuf[dstIndex + channel] = 255;
+					continue;
+				}
+				let results = 0;
+				for (var kRow = 0; kRow < kernel.length; kRow++) {
+					for (var kCol = 0; kCol < kernel[kRow].length; kCol++) {
+						const kRowOffset = (kRow - rowOffset) * src.width;
+						const kColIndex = kCol - colOffset;
+						const kOffset = (kRowOffset + kColIndex) * 4;
+						var pixel = srcBuf[srcIndex + kOffset + channel];
+						results += pixel*kernel[kRow][kCol];
 					}
 				}
-			}
-
-			var dstIndex = (row * w + col) * 4;
-			for (var channel = 0; channel < 4; channel++) {
-				var val = (opaque && channel === 3)
-					? 255
-					: result[channel] / divisor + offset;
-				dstBuf[dstIndex + channel] = val;
+				dstBuf[dstIndex + channel] =  results / divisor + offset;
 			}
 		}
 	}
 	return dst;
 }
 
-function convolve(id, filterName){
+function convolve(id, filterName, readImage){
 	const kernel = kernels.find(x => x.name === filterName);
 	if(!kernel) {
 		console.log('could not find filter: ' + filterName)
 		return;
 	}
-	return applyFilter(id, kernel.data, kernel.divisor, kernel.offset, kernel.opaque);
+	return applyFilter(id || readImage, kernel.data, kernel.divisor, kernel.offset, kernel.opaque);
 }
 
 export default convolve;
