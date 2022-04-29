@@ -33,8 +33,7 @@ Reinforcement Learning Agent
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
 const CanvasText = (text) => {
-console.log(text)
-	const DELAY = 0;
+	const DELAY = 50;
 	setTimeout(() => {
 		const { canvasOverlay: canvas } = NeuralContainer;
 		const ctx = canvas.getContext("2d");
@@ -52,6 +51,31 @@ console.log(text)
 		//canvasTxt.fontVariant = 'small-caps';
 		canvasTxt.drawText(ctx, text, canvasTxt.fontSize, canvasTxt.fontSize, canvas.width-2, canvas.height-8)
 	},DELAY);
+}
+
+// used to detect the behavior of readImage
+const imageOverflow = ({x, y, id, readImage}) => {
+	const pad = 3;
+	const imageOffset = {
+		x: -pad,
+		y: -pad,
+		width: 2*pad,
+		height: 2*pad
+	};
+	const { id: src } = readImage(imageOffset);
+	return src;
+}
+// used to detect the behavior of readImage
+const imageOverflowBR = ({x, y, id, readImage}) => {
+	const pad = 3;
+	const imageOffset = {
+		x: pad,
+		y: pad,
+		width: 0,
+		height: 0
+	};
+	const { id: src } = readImage(imageOffset);
+	return src;
 }
 
 // from: https://cs.stanford.edu/people/karpathy/convnetjs/started.html
@@ -146,6 +170,8 @@ const dummyFn = (filter) => {
 
 NeuralContainer.functions = {
 	dryRun: dummyFn('dry-run'),
+	imageOverflow,
+	imageOverflowBR,
 	regression,
 	classifier,
 };

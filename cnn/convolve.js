@@ -120,6 +120,7 @@ function applyFilter(img, kernel, divisor = 1, offset = 0, opaque = true) {
 				let results = 0;
 				for (var kRow = 0; kRow < kernel.length; kRow++) {
 					for (var kCol = 0; kCol < kernel[kRow].length; kCol++) {
+						if(kernel[kRow][kCol] === 0) continue;
 						const kRowOffset = (kRow - rowOffset) * src.width;
 						const kColIndex = kCol - colOffset;
 						const kOffset = (kRowOffset + kColIndex) * 4;

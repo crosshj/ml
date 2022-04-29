@@ -77,7 +77,6 @@ const style = `
 .canvas-container #canvas1 {
 	position: relative;
 	display: flex;
-	background-color: #101010
 }
 .canvas-container canvas {
 	position: absolute;
@@ -224,12 +223,95 @@ function cloneCanvas(oldCanvas) {
 	return newCanvas;
 }
 
-function readBlock({ x, y, xOffset=0, yOffset=0, width, height }){
+function imageOverflow({ x, y, xOffset=0, yOffset=0, width, height, id, canvas }){
+	//console.log({x, y })
+	const leftOver = x*10 + xOffset;
+	const topOver = y*10 + yOffset;
+	const rightOver = (x*10+xOffset+width) - canvas.width;
+	const bottomOver = (y*10+yOffset+height) - canvas.height;
+	
+	const topLeftCorner = leftOver > 0 && topOver > 0;
+	const topRightCorner = rightOver > 0 && topOver > 0;
+	const bottomLeftCorner = leftOver > 0 && bottomOver > 0;
+	const bottomRightCorner = rightOver > 0 && bottomOver > 0;
+
+	for(var _y=0, _h=height; _y < _h; _y++){
+		const baseIndex = _y*(width)*4;
+		if(leftOver < 0){
+			for(var _x=0, _w=Math.abs(leftOver); _x < _w; _x++){
+				const pixel = baseIndex+_x*4;
+				const src = baseIndex + (2*_w-_x)*4;
+				id.data[pixel] = id.data[src];
+				id.data[pixel+1] = id.data[src+1];
+				id.data[pixel+2] = id.data[src+2];
+				id.data[pixel+3] = id.data[src+3];
+			}
+		}
+		if(rightOver > 0){
+			const xDiff = width-rightOver;
+			for(var _x=0, _w=rightOver; _x < _w; _x++){
+				const pixel = baseIndex+(_x+xDiff)*4;
+				const src = baseIndex + (xDiff-_x-1)*4;
+				id.data[pixel] = id.data[src];
+				id.data[pixel+1] = id.data[src+1];
+				id.data[pixel+2] = id.data[src+2];
+				id.data[pixel+3] = id.data[src+3];
+			}
+		}
+		if(topOver < 0 && _y < Math.abs(topOver)){
+			const srcBase = (2*Math.abs(topOver)-_y)*(width)*4;
+			for(var _x=0, _w=width; _x < _w; _x++){
+				const pixel = baseIndex+_x*4;
+				const src = srcBase+_x*4;
+				id.data[pixel] = id.data[src];
+				id.data[pixel+1] = id.data[src+1];
+				id.data[pixel+2] = id.data[src+2];
+				id.data[pixel+3] = id.data[src+3];
+			}
+		}
+		if(bottomOver > 0 && _y >= (height-bottomOver)){
+			const diff = height-bottomOver;
+			const srcBase = (2*diff-_y-1)*(width)*4;
+			for(var _x=0, _w=width; _x < _w; _x++){
+				const pixel = baseIndex+_x*4;
+				const src = srcBase+_x*4;
+				id.data[pixel] = id.data[src];
+				id.data[pixel+1] = id.data[src+1];
+				id.data[pixel+2] = id.data[src+2];
+				id.data[pixel+3] = id.data[src+3];
+			}
+		}
+	}
+
+
+	// if(topLeftCorner){
+	// 	console.log('correct topLeftCorner');
+	// }
+	// if(topRightCorner){
+	// 	console.log('correct topRightCorner');
+	// }
+	// if(bottomLeftCorner){
+	// 	console.log('correct bottomLeftCorner');
+	// }
+	// if(bottomRightCorner){
+	// 	console.log('correct bottomRightCorner');
+	// }
+}
+
+function readBlock(args){
+	const { x, y, xOffset=0, yOffset=0, width, height } = args;
 	if(!this.canvasReadOnly){
 		this.canvasReadOnly = cloneCanvas(this.canvas);
 	}
 	const ctx = this.canvasReadOnly.getContext('2d');;
 	const id = ctx.getImageData(x*10+xOffset, y*10+xOffset, width, height);
+
+	imageOverflow({
+		...args,
+		id,
+		canvas: this.canvasReadOnly
+	})
+
 	const set = [];
 	return { id, set };
 }
@@ -333,7 +415,7 @@ async function ready(){
 			}
 		}
 		this.canvasReadOnly = cloneCanvas(this.canvas);
-		_ShowOverlayBlock();
+		setTimeout(_ShowOverlayBlock, 1000);
 		runButton.classList.remove('hidden');
 		pauseButton.classList.add('hidden');
 	}
