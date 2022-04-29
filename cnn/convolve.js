@@ -1,3 +1,12 @@
+/*
+references:
+
+https://gist.github.com/kuon/c9f59b33a71f8e6fcba0c9560f21c21a
+https://www.phpied.com/canvas-pixels-2-convolution-matrix/
+
+*/
+
+
 const matrices3x3 = [
 	{
 		name: 'mean removal',

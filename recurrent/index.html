@@ -16,7 +16,8 @@
 		<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100&display=swap" rel="stylesheet">
 	</head>
 	<body>
-		<neural-container x="10" y="10" width="160" height="120">
+		<span style="font-family: Roboto Mono;"><!-- dumb preload --></span>
+		<neural-container name="recurrent" x="10" y="10" width="160" height="120">
 			<images slot="images" style="display:none;">
 				<img name="Cool Frog" value="frog" src="https://crosshj.com/sandbox/src/canvas/frog.png">
 				<img name="Samurai Horse" value="horse" src="https://crosshj.com/sandbox/src/canvas/horse.png">
@@ -32,11 +33,8 @@
 				<img name="Japanese Wave" value="wave1">
 			</images>
 			<functions slot="functions">
-				<function name="Dry Run" event="dryRun"></function>
-				<function name="Image Down Right" event="imageOverflow"></function>
-				<function name="Image Left Up" event="imageOverflowBR"></function>
-				<function name="Classification" event="classifier"></function>
-				<function name="Regression" event="regression"></function>
+				<function name="Classification" event="classifier" steps=1></function>
+				<function name="Regression" event="regression" steps=1></function>
 			</functions>
 		</neural-container>
 	</body>

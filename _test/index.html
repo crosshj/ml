@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>gpu</title>
+		<title>container tests</title>
 		<meta charset="utf-8">
 		<meta name="description" content="">
 		<meta name="author" content="">
@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<span style="font-family: Roboto Mono;"><!-- dumb preload --></span>
-		<neural-container name="gpu" x="10" y="10" width="160" height="120">
+		<neural-container name="tests" x="10" y="10" width="160" height="120">
 			<images slot="images" style="display:none;">
 				<img name="Cool Frog" value="frog" src="https://crosshj.com/sandbox/src/canvas/frog.png">
 				<img name="Samurai Horse" value="horse" src="https://crosshj.com/sandbox/src/canvas/horse.png">
@@ -33,8 +33,12 @@
 				<img name="Japanese Wave" value="wave1">
 			</images>
 			<functions slot="functions">
-				<function name="GPU Compute" event="gpuCompute" steps=1></function>
-				<function name="GPU Render" event="gpuRender" steps=1></function>
+				<function name="One Step" event="oneStep" steps=1></function>
+				<function name="Dry Run" event="dryRun"></function>
+				<function name="Image Down Right" event="imageOverflowDR"></function>
+				<function name="Image Down Left" event="imageOverflowDL"></function>
+				<function name="Image Up Right" event="imageOverflowUR"></function>
+				<function name="Image Up Left" event="imageOverflowUL"></function>
 			</functions>
 		</neural-container>
 	</body>

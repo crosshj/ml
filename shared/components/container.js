@@ -1,3 +1,4 @@
+import canvasTxt from 'https://cdn.skypack.dev/canvas-txt';
 import canvasOps from '../canvasOps.js';
 import '../pixelOps.js';
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -153,6 +154,31 @@ select:focus, select:active {
 }
 `.trim();
 
+async function CanvasText(text){
+	let ready = await document.fonts.ready;
+	// console.log('Fonts Ready: ' + JSON.stringify(ready))
+	// console.log('Roboto Mono Ready: ' + document.fonts.check('1em Roboto Mono'))
+	// const DELAY = 50;
+	// setTimeout(() => {
+		const { canvasOverlay: canvas } = this;
+		const ctx = canvas.getContext("2d");
+		ctx.clearRect(0,0, canvas.width, canvas.height);
+		ctx.fillStyle = "#000c";
+		ctx.fillRect(0,0, canvas.width, canvas.height);
+		ctx.fillStyle = "white"
+		canvasTxt.fontSize = 16;
+		canvasTxt.align = 'left';
+		canvasTxt.vAlign = 'top';
+		//canvasTxt.font = 'VT323';
+		// canvasTxt.font = 'Varela';
+		canvasTxt.font = 'Roboto Mono';
+		//canvasTxt.font = 'Monospace';
+		//canvasTxt.fontWeight = 100;
+		//canvasTxt.fontVariant = 'small-caps';
+		canvasTxt.drawText(ctx, text, canvasTxt.fontSize, canvasTxt.fontSize, canvas.width-2, canvas.height-8)
+	// },DELAY);
+}
+
 const SelectOption = ({ name, value}) => `<option value="${value}">${name}</option>`
 
 function ShowOverlayBlock(x,y){
@@ -203,7 +229,7 @@ function changeImage(which, callback) {
 	const _setBodyBack = setBodyBack.bind(this);
 	if(!canvasOps[which]) return;
 	//todo: call event to put component in loading state
-	sessionStorage.setItem('neural-net-image', which);
+	sessionStorage.setItem(this.appName + '-neural-net-image', which);
 	const { canvas } = this;
 	const dimensions = {
 		x: 160,
@@ -251,7 +277,7 @@ function imageOverflow({ x, y, xOffset=0, yOffset=0, width, height, id, canvas }
 			const xDiff = width-rightOver;
 			for(var _x=0, _w=rightOver; _x < _w; _x++){
 				const pixel = baseIndex+(_x+xDiff)*4;
-				const src = baseIndex + (xDiff-_x-1)*4;
+				const src = baseIndex + (xDiff-_x-2)*4;
 				id.data[pixel] = id.data[src];
 				id.data[pixel+1] = id.data[src+1];
 				id.data[pixel+2] = id.data[src+2];
@@ -271,7 +297,7 @@ function imageOverflow({ x, y, xOffset=0, yOffset=0, width, height, id, canvas }
 		}
 		if(bottomOver > 0 && _y >= (height-bottomOver)){
 			const diff = height-bottomOver;
-			const srcBase = (2*diff-_y-1)*(width)*4;
+			const srcBase = (2*diff-_y-2)*(width)*4;
 			for(var _x=0, _w=width; _x < _w; _x++){
 				const pixel = baseIndex+_x*4;
 				const src = srcBase+_x*4;
@@ -345,20 +371,21 @@ async function ready(){
 		.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()) )
 		.map(SelectOption)
 		.join('\n');
-	imageSelector.value = sessionStorage.getItem('neural-net-image') || imageOptions[0]?.value;
+	imageSelector.value = sessionStorage.getItem(this.appName + '-neural-net-image') || imageOptions[0]?.value;
 	imageSelector.onchange = () => changeImage(imageSelector.value);
 
 	const fnOptions = inputFunctions.map(x => {
 		return {
 			name: x.getAttribute('name') || x.getAttribute('event'),
-			value: x.getAttribute('event') || x.getAttribute('name')
+			value: x.getAttribute('event') || x.getAttribute('name'),
+			steps: x.getAttribute('steps') ? Number(x.getAttribute('steps')) : ''
 		}
 	});
 	functionSelector.innerHTML = fnOptions
 		.sort((a,b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()) )
 		.map(SelectOption)
 		.join('\n');
-	functionSelector.value = sessionStorage.getItem('neural-net-fn') || fnOptions[0]?.value;
+	functionSelector.value = sessionStorage.getItem(this.appName + '-neural-net-fn') || fnOptions[0]?.value;
 	functionSelector.onchange = () => changeFunction(functionSelector.value);
 
 	refreshButton.onclick = () => {
@@ -368,6 +395,34 @@ async function ready(){
 		pauseButton.classList.add('hidden');
 		this.paused = 'canceled';
 	}
+
+	const done = ({ steps }={}) => {
+		this.canvasReadOnly = cloneCanvas(this.canvas);
+		steps !== 1 && setTimeout(_ShowOverlayBlock, 1000);
+		runButton.classList.remove('hidden');
+		pauseButton.classList.add('hidden');
+	};
+
+	const run = async ({ x,y,fn,steps }) => {
+		steps !== 1 && _ShowOverlayBlock(x,y);
+		const { id } = readBlock.bind(this)({
+			x, y, width: 10, height: 10
+		});
+		const readImage = (offset) => readBlock.bind(this)({
+			x, y,
+			xOffset: offset.x,
+			yOffset: offset.y,
+			width: 10 + (offset.width || 0),
+			height: 10 + (offset.height || 0),
+		});
+		const newImgData = await fn({
+			x, y, id, readImage
+		});
+		await writeBlock.bind(this)({
+			x, y, width: 10, height: 10, imageData: newImgData
+		});
+	};
+
 	runButton.onclick = async () => {
 		runButton.classList.add('hidden');
 		pauseButton.classList.remove('hidden');
@@ -383,41 +438,28 @@ async function ready(){
 			delete this.paused;
 		}
 		const { currentFunction, functions } = this;
-		if(!functions[currentFunction]){
+		const { steps } = fnOptions.find(x => x.value === currentFunction) || {};
+		const fn = functions[currentFunction];
+
+		if(!fn){
 			console.log('Function not defined: ' + currentFunction);
 			return;
 		}
+		if(steps === 1){
+			await run({ x:0, y:0, fn, steps });
+			done({ steps });
+			return;
+		}
 		for(var [x] of new Array(16).entries()){
-			//if(x===0) continue;
 			for(var [y] of new Array(12).entries()){
-				//if(y===0) continue;
 				if(this.paused){
 					const status = await this.paused;
 					if(status === 'canceled') break;
 				}
-				_ShowOverlayBlock(x,y);
-				const { id } = readBlock.bind(this)({
-					x, y, width: 10, height: 10
-				});
-				const readImage = (offset) => readBlock.bind(this)({
-					x, y,
-					xOffset: offset.x,
-					yOffset: offset.y,
-					width: 10 + (offset.width || 0),
-					height: 10 + (offset.height || 0),
-				});
-				const newImgData = await functions[currentFunction]({
-					x, y, id, readImage
-				});
-				await writeBlock.bind(this)({
-					x, y, width: 10, height: 10, imageData: newImgData
-				});
+				await run({ x, y, fn, steps });
 			}
 		}
-		this.canvasReadOnly = cloneCanvas(this.canvas);
-		setTimeout(_ShowOverlayBlock, 1000);
-		runButton.classList.remove('hidden');
-		pauseButton.classList.add('hidden');
+		done();
 	}
 	pauseButton.onclick = async () => {
 		let pausedResolve;
@@ -474,7 +516,7 @@ class Container extends HTMLElement {
 			<slot name="images"></slot>
 			<slot name="functions"></slot>
 		</div>
-		`
+		`;
 		this.functions = [];
 		this.loadedHandlers = [];
 		this.container = this.shadowRoot.querySelector('.container');
@@ -497,15 +539,18 @@ class Container extends HTMLElement {
 		this.inputFunctions = Array.from(this.functionsSlot.assignedElements({flatten: true})?.[0]?.children);
 
 		this.notesSlot = this.shadowRoot.querySelector('slot[name="notes"]');
-		
+		this.CanvasText = CanvasText.bind(this);
+
 		this.changeImage = async (which) => {
 			this.imageSelector.value = which;
 			await new Promise((resolve) => {
 				changeImage.bind(this)(which, resolve);
 			})
 		};
+		
+		this.appName = this.getAttribute('name');
 		this.changeFunction = async (which) => {
-			sessionStorage.setItem('neural-net-fn', which);
+			sessionStorage.setItem(this.appName+'-neural-net-fn', which);
 			this.currentFunction = which;
 		};
 		this.ready = ready.bind(this)();

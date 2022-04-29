@@ -6,16 +6,10 @@ const NeuralContainer = document.querySelector('neural-container');
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const notes = `
-overall goals:
-	- better platform for NN exploration
-	- explore convolutional nn's
-
-overall todo:
+todo:
 	- connect convolution to ANN
-	- visualize output and in-progress processes
-
-container todo:
-	- loading screens
+	- convolution stride / dims / options
+		- https://machinelearningmastery.com/padding-and-stride-for-convolutional-neural-networks/
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
@@ -37,42 +31,27 @@ const liqNetOptions = [input, pool, output, connections, gates];
 const netOptions = [20, 21, 1];
 
 
-const dummyFn = (filter) => {
-	return async (args) => {
-		if(filter==='dry-run'){
-			await delay(30);
-			return args.id;
-		}
-		// for (var i=0,len=id.data.length; i < len; i+= 4) {
-		// 	id.data[i] = 0;
-		// 	id.data[i+1] = id.data[i+1];
-		// 	id.data[i+2] = 0;
-		// 	id.data[i+3] = 255;
-		// }
-		//mean removal, sharpen, blur, emboss, emboss subtle, edge detect, edge detect 2
-		//await delay(0);
-		const newImageData = convolve(null, filter, args.readImage) || args.id;
-		return newImageData;
-	};
-};
+const filter = (filter) => async (args) => 
+	convolve(null, filter, args.readImage) || args.id;
 
 NeuralContainer.functions = {
-	// "net-convo": dummyFn,
-	// "net-reconst": dummyFn
-	dryRun: dummyFn('dry-run'),
-	mean: dummyFn('mean removal'),
-	sharpen: dummyFn('sharpen'),
-	blur: dummyFn('blur'),
-	emboss: dummyFn('emboss'),
-	embossSubtle: dummyFn('emboss subtle'),
-	edgeDetect: dummyFn('edge detect'),
-	edgeDetect2: dummyFn('edge detect 2'),
-	dunno: dummyFn('dunno'),
+	// "net-convo": todo,
+	// "net-reconst": todo
+	dryRun: filter('dry-run'),
+	mean: filter('mean removal'),
+	sharpen: filter('sharpen'),
+	blur: filter('blur'),
+	emboss: filter('emboss'),
+	embossSubtle: filter('emboss subtle'),
+	edgeDetect: filter('edge detect'),
+	edgeDetect2: filter('edge detect 2'),
+	dunno: filter('dunno'),
 };
 
-// NeuralContainer.onLoad(async () => {
-// 	await NeuralContainer.changeImage('frog');
-// });
+NeuralContainer.onLoad(async () => {
+	//await NeuralContainer.changeImage('frog');
+	NeuralContainer.runButton.onclick()
+});
 
 await NeuralContainer.ready;
 //console.log('okay to go neural net')

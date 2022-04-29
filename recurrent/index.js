@@ -1,9 +1,9 @@
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
-import canvasTxt from 'https://cdn.skypack.dev/canvas-txt';
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const NeuralContainer = document.querySelector('neural-container');
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const { CanvasText } = NeuralContainer;
 
 const notes = `
 https://github.com/karpathy/recurrentjs
@@ -32,66 +32,16 @@ Reinforcement Learning Agent
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
-const CanvasText = (text) => {
-	const DELAY = 50;
-	setTimeout(() => {
-		const { canvasOverlay: canvas } = NeuralContainer;
-		const ctx = canvas.getContext("2d");
-		ctx.fillStyle = "#000c";
-		ctx.fillRect(0,0, canvas.width, canvas.height);
-		ctx.fillStyle = "white"
-		canvasTxt.fontSize = 16;
-		canvasTxt.align = 'left';
-		canvasTxt.vAlign = 'top';
-		//canvasTxt.font = 'VT323';
-		// canvasTxt.font = 'Varela';
-		canvasTxt.font = 'Roboto Mono';
-		//canvasTxt.font = 'Monospace';
-		//canvasTxt.fontWeight = 100;
-		//canvasTxt.fontVariant = 'small-caps';
-		canvasTxt.drawText(ctx, text, canvasTxt.fontSize, canvasTxt.fontSize, canvas.width-2, canvas.height-8)
-	},DELAY);
-}
-
-// used to detect the behavior of readImage
-const imageOverflow = ({x, y, id, readImage}) => {
-	const pad = 3;
-	const imageOffset = {
-		x: -pad,
-		y: -pad,
-		width: 2*pad,
-		height: 2*pad
-	};
-	const { id: src } = readImage(imageOffset);
-	return src;
-}
-// used to detect the behavior of readImage
-const imageOverflowBR = ({x, y, id, readImage}) => {
-	const pad = 3;
-	const imageOffset = {
-		x: pad,
-		y: pad,
-		width: 0,
-		height: 0
-	};
-	const { id: src } = readImage(imageOffset);
-	return src;
-}
-
 // from: https://cs.stanford.edu/people/karpathy/convnetjs/started.html
 function classifier({x, y, id, readImage}){
-	if(x!==15 || y!==11) return;
-
 	const output = [];
 	const net = new convnetjs.Net();
 	net.makeLayers([
 		// input layer of size 1x1x2 (all volumes are 3D)
 		{type:'input', out_sx:1, out_sy:1, out_depth:3},
-
 		// some fully connected layers
 		{type:'fc', num_neurons:20, activation:'relu'},
 		{type:'fc', num_neurons:20, activation:'relu'},
-
 		// a softmax classifier predicting probabilities for two classes: 0,1
 		{type:'softmax', num_classes:3}
 	]);
@@ -119,7 +69,6 @@ function classifier({x, y, id, readImage}){
 
 // from: https://cs.stanford.edu/people/karpathy/convnetjs/started.html
 function regression({x, y, id, readImage}){
-	if(x!==15 || y!==11) return;
 	const output = [];
 
 	const net = new convnetjs.Net();
@@ -158,20 +107,7 @@ function regression({x, y, id, readImage}){
 	CanvasText(output.join('\n\n'));
 }
 
-
-const dummyFn = (filter) => {
-	return async (args) => {
-		if(filter==='dry-run'){
-			await delay(30);
-			return args.id;
-		}
-	};
-};
-
 NeuralContainer.functions = {
-	dryRun: dummyFn('dry-run'),
-	imageOverflow,
-	imageOverflowBR,
 	regression,
 	classifier,
 };
