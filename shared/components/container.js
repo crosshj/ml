@@ -28,6 +28,8 @@ const style = `
 :host {
 	position: absolute;
 	left: 0; top: 0; bottom: 0; right: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .hidden { display: none; }
@@ -57,7 +59,7 @@ const style = `
 	#bg-image { display: none; }
 }
 .container {
-	height: 100vh;
+	/* height: 100vh; */
 	max-width: 820px;
 	width: 100vw;
 	margin: auto;
@@ -99,10 +101,6 @@ select {
 select:focus, select:active {
 	border:0;
 	outline:0;
-}
-.extend {
-	box-shadow: inset 0px 2px 6px -3px black;
-	background: #2b2b2b;
 }
 .controls, .extend {
 	color: #aaa;
@@ -151,7 +149,6 @@ select:focus, select:active {
 	white-space: pre-wrap;
 	padding: 2em;
 	margin: 0;
-	overflow: auto;
 }
 @media only screen and (max-width: 600px) {
 	::slotted(pre), pre {

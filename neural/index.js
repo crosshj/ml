@@ -19,10 +19,10 @@ const {
 const GRID_SIZE = 10;
 
 const tOptions = {
-	rate: .02,
-	iterations: 500,
-	error: .01,
-	shuffle: false,
+	rate: .03,
+	iterations: 100,
+	error: .002,
+	shuffle: true,
 	log: 0
 };
 const netOptions = [20, 20, 1];
@@ -30,7 +30,6 @@ const netOptions = [20, 20, 1];
 
 const notes = `
 todo:
-	- PARITY: image iteration
 	- PARITY: svg filter
 	- image error map
 	- indicate rate of change in network
@@ -65,10 +64,37 @@ const Extra = (() => {
 				display: flex;
 				flex-direction: row;
 				justify-content: space-between;
+				background: #2b2b2b;
+				box-shadow: inset 0px 2px 6px -3px black;
 			}
 			#iterations > div,
 			#error > div {
 				padding: 0.5em;
+			}
+			#results {
+				width: 300px;
+				height: 200px;
+				background: #222222;
+				margin: auto;
+				left: 0;
+				right: 0;
+				display: grid;
+				grid-template-rows: repeat(12, 1fr);
+				grid-template-columns: repeat(16, 1fr);
+				grid-auto-flow: column;
+				font-size: 9px;
+				font-family: monospace;
+				color: white;
+				margin-bottom: 1em;
+				margin-top: 2em;
+				box-shadow: 0px 0px 10px 0px #111111;
+			}
+			#results > div {
+				background: #333;
+				text-align: center;
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		</style>
 		<div id="indicators">
@@ -88,22 +114,30 @@ const errorDiv = Extra.querySelector('#error');
 errorDiv.set = (x) => errorDiv.innerHTML = '<div>error: ' + x + '</div>';
 errorDiv.clear = () => iterDiv.innerHTML = "";
 
-const ResultsDiv = () => {
-	const canvasContainer = document.getElementById('canvas-container');
-	const div = document.createElement('div');
-	div.id = "results";
-	canvasContainer.append(div);
+const gradient = (x, max) => {
+	const r = Math.floor((x/max) * 255);
+	const g = 0;
+	const b = 255 - r;
+	return `rgb(${r},${g},${b})`;
+}
+
+const { set: setResults, reset: resetResults } = (() => {
+	const div = Extra.querySelector('#results');
+	div.style.display = 'none';
 	return {
 		set: ({ iterations, error }) => {
+			div.style.display = 'grid';
 			const square = document.createElement('div');
 			square.textContent = iterations;
+			square.style.backgroundColor = gradient(iterations, 100);
 			div.append(square);
 		},
 		reset: () => {
+			div.style.display = 'none';
 			div.innerHTML = '';
 		}
 	};
-};
+})();
 
 function getInputs(id, x, y, xmax, ymax){
 	//position metrics
@@ -179,8 +213,8 @@ function activateNet(set){
 function train(args){
 	const { x, y, ctx, set, setter, id, iterations=0, callback: cb } = args;
 
-	const callback = () => {
-		//setResults({ iterations, error: results.error });
+	const callback = (results) => {
+		setResults({ iterations, error: results?.error });
 		cb();
 	};
 
