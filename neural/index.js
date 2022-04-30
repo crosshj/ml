@@ -40,6 +40,13 @@ todo:
 is anything really be learned here?
 does enything get stored in long-term memory?
 why do solid-colored blocks later in cause traning to hang?
+
+what if after training, network could decide to not change?
+	- change costed too much, won't learn this (adapt vs not)
+	- change costed too much, will fork or use another fork (memory)
+
+a nn with error set high is lossy.
+if it is trained on its own output, does it reach a lossless state?
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
