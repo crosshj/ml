@@ -1,37 +1,11 @@
-import canvasOps from '../shared/canvasOps.js';
+import '../shared/components/container.js';
+import convnetjs from 'https://cdn.skypack.dev/convnetjs';
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/*
-http://cs.stanford.edu/people/karpathy/convnetjs/
-
-*/
-let errorDiv;
-let iterDiv;
-let setResults;
-let resetResults;
-
-const tOptions = {
-	rate: .01,
-	iterations: 500,
-	error: .0005,
-	shuffle: false,
-	log: 0
-};
-
-const GRID_SIZE = 10;
-
-var input = 20;
-var pool = 100;
-var output = 1;
-var connections = 20;
-var gates = 10;
-
-const liqNetOptions = [input, pool, output, connections, gates];
-const netOptions = [20, 21, 1];
-
+const NeuralContainer = document.querySelector('neural-container');
+const { CanvasText } = NeuralContainer;
 const {Architect, Trainer} = synaptic;
 const {
-	clone,
-	range,
 	spread,
 	shrink,
 	intToBitArray,
@@ -42,6 +16,33 @@ const {
 	getRightUpDiagBalance
 } = pixelOps;
 
+const GRID_SIZE = 10;
+
+const tOptions = {
+	rate: .02,
+	iterations: 500,
+	error: .01,
+	shuffle: false,
+	log: 0
+};
+const netOptions = [20, 20, 1];
+
+
+const notes = `
+todo:
+	- PARITY: running error indicator
+	- PARITY: running iterations indicator
+	- PARITY: image iteration
+	- PARITY: svg filter
+	- image error map
+	- indicate rate of change in network
+
+is anything really be learned here?
+does enything get stored in long-term memory?
+why do solid-colored blocks later in cause traning to hang?
+`;
+NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
+
 function getInputs(id, x, y, xmax, ymax){
 	//position metrics
 	const xyInputs = intToBitArray(y,8).concat(intToBitArray(x,8));
@@ -50,7 +51,6 @@ function getInputs(id, x, y, xmax, ymax){
 	const xBefore = getXBeforeBalance(id, x, y, xmax);
 	const leftUp = getLeftUpDiagBalance(id, x, y, xmax);
 	const rightUp = getRightUpDiagBalance(id, x, y, xmax);
-
 	const inputs = xyInputs.concat([yBefore, xBefore, leftUp, rightUp]);
 	return inputs;
 }
@@ -60,14 +60,13 @@ function trainingSetFromImageData(id, xmax, ymax){
 	var max = 0;
 	var min = 255;
 	id.data.forEach((x,i)=>{
-		if(i%4-1===0){ //green
-			if(max < x){ max = x; }
-			if(min > x){ min = x; }
-		}
+		if(i%4-1 != 0) return;
+		//green
+		if(max < x){ max = x; }
+		if(min > x){ min = x; }
 	});
-
-	range(0, xmax).forEach((unused_x, x) => {
-		range(0, ymax).forEach((unused_y, y) => {
+	for(var [x] of new Array(xmax).entries()){
+		for(var [y] of new Array(ymax).entries()){
 			const offset = xmax*y*4 + x*4;
 			results.push({
 				input: getInputs(id, x, y, xmax, ymax),
@@ -75,17 +74,15 @@ function trainingSetFromImageData(id, xmax, ymax){
 					spread(id.data[offset + 1],max,min)/255
 				]
 			});
-
-		});
-	});
-
+		}
+	}
 	return results;
 }
 
 function imageFromNet(id, setter, xmax, ymax, nt){
-	range(0, xmax).forEach((unused_x, x) => {
-		range(0, ymax).forEach((unused_y, y) => {
-			const offset = xmax*y*4 + x*4;
+	for(var [x] of new Array(xmax).entries()){
+		for(var [y] of new Array(ymax).entries()){
+		const offset = xmax*y*4 + x*4;
 			var greenOutput = nt.activate(
 				getInputs(id, x, y, xmax, ymax)
 			)[0];
@@ -97,11 +94,10 @@ function imageFromNet(id, setter, xmax, ymax, nt){
 				a: 255
 			};
 			setter(id, _color, {x, y, xmax});
-		});
-	});
+		}
+	}
 	return id;
 }
-
 
 const net = new Architect.Perceptron(...netOptions);
 //const net = new Architect.Liquid(...liqNetOptions);
@@ -118,12 +114,11 @@ function activateNet(set){
 	};
 }
 
-
 function train(args){
 	const { x, y, ctx, set, setter, id, iterations=0, callback: cb } = args;
 
 	const callback = () => {
-		setResults({ iterations, error: results.error });
+		//setResults({ iterations, error: results.error });
 		cb();
 	};
 
@@ -142,8 +137,8 @@ function train(args){
 	requestAnimationFrame(async () => {
 		ctx.putImageData( id, x*GRID_SIZE, y*GRID_SIZE);
 
-		errorDiv.textContent = testResults.error.toFixed(4);
-		iterDiv.textContent = iterations;
+		//errorDiv.textContent = testResults.error.toFixed(4);
+		//iterDiv.textContent = iterations;
 
 		if(!iterOkay) return callback();
 		if(errorOkay) return callback();
@@ -153,110 +148,36 @@ function train(args){
 	 });
 };
 
-function neuralize(setter){
-	resetResults();
-	const ctx = this.canvas.getContext('2d');;
-	const xmax = this.dimensions.x;
-	const ymax = this.dimensions.y;
+function setImageDataPixel(imageData, {r=0, g=0, b=0, a=255}, {x=0, y=0, xmax=1}){
+	const ad = imageData.data;
+	const rowOffset = y * 4 * xmax;
+	const colOffset = x * 4;
+	const offset = rowOffset + colOffset;
+	ad[offset + 0]   = r;
+	ad[offset + 1]   = g;
+	ad[offset + 2]   = b;
+	ad[offset + 3]   = a;
+}
 
-	var tasksArray = [];
+const neural = async (args) => new Promise((resolve) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
 
-	range(0, xmax/GRID_SIZE).forEach((unused_x, x) => {
-		range(0, ymax/GRID_SIZE).forEach((unused_y, y) => {
-			tasksArray.push((callback) => {
-				const id = ctx.getImageData(x*GRID_SIZE, y*GRID_SIZE, GRID_SIZE, GRID_SIZE);
-				const set = trainingSetFromImageData(id, GRID_SIZE, GRID_SIZE);
-				train({ x, y, ctx, set, id, setter, callback });
-			});
-		});
+	const set = trainingSetFromImageData(id, GRID_SIZE, GRID_SIZE);
+	train({
+		x, y,
+		ctx,
+		set,
+		id,
+		setter: setImageDataPixel,
+		callback: resolve
 	});
+});
 
-	var task = 0;
-	var taskCallback = ()=>{
-		task+=1;
-		if(task >= tasksArray.length){ return; }
-		tasksArray[task](taskCallback);
-	};
-	tasksArray[task](taskCallback);
-}
-
-function filter(){
-	this.canvas.style.filter = this.canvas.style.filter
-		? ''
-		: 'url(#myFilter)';
-}
-
-const {
-	lenna,
-	vader,
-	nnTest1,
-	random
-} = canvasOps;
-
-var buttons = [{
-	text: 'random',
-	onClick: random
-},{
-	text: 'nntest1',
-	onClick: nnTest1
-},{
-	text: 'lena',
-	onClick: lenna
-},{
-	text: 'vader',
-	onClick: vader
-},{
-	text: 'filter',
-	onClick: filter
-}, {
-	text: 'neural',
-	onClick: neuralize
-}];
-
-
-var options = {
-	init: random,
-	buttons
+NeuralContainer.functions = {
+	neural,
 };
 
-const ErrorDiv = () => {
-	const div = document.createElement('div');
-	div.id = "error";
-	document.body.append(div);
-	return div
-};
-
-const IterDiv = () => {
-	const div = document.createElement('div');
-	div.id = "iterations";
-	document.body.append(div);
-	return div
-};
-
-const ResultsDiv = () => {
-	const canvasContainer = document.getElementById('canvas-container');
-	const div = document.createElement('div');
-	div.id = "results";
-	canvasContainer.append(div);
-	return {
-		set: ({ iterations, error }) => {
-			const square = document.createElement('div');
-			square.textContent = iterations;
-			div.append(square);
-		},
-		reset: () => {
-			div.innerHTML = '';
-		}
-	};
-};
-
-function ready(){
-	var cv = new CanvasPlus(options);
-	cv.start();
-	errorDiv = ErrorDiv();
-	iterDiv = IterDiv();
-	({ set: setResults, reset: resetResults } = ResultsDiv());
-}
-
-document.addEventListener('DOMContentLoaded', ready, false);
-
+NeuralContainer.onLoad(async () => {
+	NeuralContainer.runButton.onclick()
+});
