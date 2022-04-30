@@ -30,8 +30,6 @@ const netOptions = [20, 20, 1];
 
 const notes = `
 todo:
-	- PARITY: running error indicator
-	- PARITY: running iterations indicator
 	- PARITY: image iteration
 	- PARITY: svg filter
 	- image error map
@@ -51,6 +49,61 @@ in this case, what's left of input?
 does traning get faster?
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
+
+const Extra = (() => {
+	const div = document.createElement('div');
+	div.id = 'extra-controls'
+	div.innerHTML = `
+		<style>
+			#extra-controls {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				font-family: arial;
+			}
+			#indicators {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+			#iterations > div,
+			#error > div {
+				padding: 0.5em;
+			}
+		</style>
+		<div id="indicators">
+			<div id="iterations"></div>
+			<div id="error"></div>
+		</div>
+		<div id="results"></div>
+	`;
+	NeuralContainer.extend.append(div);
+	return div
+})();
+
+const iterDiv = Extra.querySelector('#iterations');
+iterDiv.set = (x) => iterDiv.innerHTML = '<div>iterations: ' + x + '</div>';
+iterDiv.clear = () => iterDiv.innerHTML = "";
+const errorDiv = Extra.querySelector('#error');
+errorDiv.set = (x) => errorDiv.innerHTML = '<div>error: ' + x + '</div>';
+errorDiv.clear = () => iterDiv.innerHTML = "";
+
+const ResultsDiv = () => {
+	const canvasContainer = document.getElementById('canvas-container');
+	const div = document.createElement('div');
+	div.id = "results";
+	canvasContainer.append(div);
+	return {
+		set: ({ iterations, error }) => {
+			const square = document.createElement('div');
+			square.textContent = iterations;
+			div.append(square);
+		},
+		reset: () => {
+			div.innerHTML = '';
+		}
+	};
+};
 
 function getInputs(id, x, y, xmax, ymax){
 	//position metrics
@@ -146,8 +199,8 @@ function train(args){
 	requestAnimationFrame(async () => {
 		ctx.putImageData( id, x*GRID_SIZE, y*GRID_SIZE);
 
-		//errorDiv.textContent = testResults.error.toFixed(4);
-		//iterDiv.textContent = iterations;
+		errorDiv.set(testResults.error.toFixed(4));
+		iterDiv.set(iterations);
 
 		if(!iterOkay) return callback();
 		if(errorOkay) return callback();
@@ -188,5 +241,5 @@ NeuralContainer.functions = {
 };
 
 NeuralContainer.onLoad(async () => {
-	NeuralContainer.runButton.onclick()
+	//NeuralContainer.runButton.onclick()
 });

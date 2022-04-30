@@ -100,17 +100,23 @@ select:focus, select:active {
 	border:0;
 	outline:0;
 }
-.controls {
-	background: #333333;
+.extend {
+	box-shadow: inset 0px 2px 6px -3px black;
+	background: #2b2b2b;
+}
+.controls, .extend {
 	color: #aaa;
-	padding: .5em;
 	font-size: 1.1em;
 	display: flex;
-	justify-content: flex-end;
 	user-select: none;
 }
+.controls {
+	background: #333333;
+	justify-content: flex-end;
+	padding: .5em;
+}
 @media only screen and (max-width: 600px) {
-	.controls { font-size: 0.75em; }
+	.controls, .extend { font-size: 0.75em; }
 }
 .controls select {
 	box-shadow:
@@ -145,6 +151,7 @@ select:focus, select:active {
 	white-space: pre-wrap;
 	padding: 2em;
 	margin: 0;
+	overflow: auto;
 }
 @media only screen and (max-width: 600px) {
 	::slotted(pre), pre {
@@ -515,6 +522,7 @@ class Container extends HTMLElement {
 				<select name="function" id="function-selector"></select>
 				<select name="image" id="image-selector"></select>
 			</div>
+			<div class="extend"></div>
 			<slot name="notes"></slot>
 			<slot name="images"></slot>
 			<slot name="functions"></slot>
@@ -543,6 +551,8 @@ class Container extends HTMLElement {
 
 		this.notesSlot = this.shadowRoot.querySelector('slot[name="notes"]');
 		this.CanvasText = CanvasText.bind(this);
+		
+		this.extend = this.shadowRoot.querySelector('.extend');
 
 		this.changeImage = async (which) => {
 			this.imageSelector.value = which;
