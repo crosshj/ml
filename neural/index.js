@@ -47,6 +47,8 @@ what if after training, network could decide to not change?
 
 a nn with error set high is lossy.
 if it is trained on its own output, does it reach a lossless state?
+in this case, what's left of input?
+does traning get faster?
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
