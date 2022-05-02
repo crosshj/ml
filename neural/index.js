@@ -1,3 +1,4 @@
+import Filter from './filter-svg.js';
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -27,10 +28,11 @@ const tOptions = {
 };
 const netOptions = [20, 20, 1];
 
+const filter = new Filter();
+filter.attach(NeuralContainer.canvas.parentNode);
 
 const notes = `
 todo:
-	- PARITY: svg filter
 	- image error map
 	- indicate rate of change in network
 
@@ -68,7 +70,8 @@ const Extra = (() => {
 				box-shadow: inset 0px 2px 6px -3px black;
 			}
 			#iterations > div,
-			#error > div {
+			#error > div,
+			#filter {
 				padding: 0.5em;
 			}
 			#results {
@@ -96,10 +99,19 @@ const Extra = (() => {
 				justify-content: center;
 				align-items: center;
 			}
+			#filter {
+				display: flex;
+				margin-top: auto;
+				margin-bottom: auto;
+				margin-right: 0.5em;
+			}
 		</style>
 		<div id="indicators">
 			<div id="iterations"></div>
 			<div id="error"></div>
+			<div id="filter">
+				<button>filter</button>
+			</div>
 		</div>
 		<div id="results"></div>
 	`;
@@ -113,6 +125,9 @@ iterDiv.clear = () => iterDiv.innerHTML = "";
 const errorDiv = Extra.querySelector('#error');
 errorDiv.set = (x) => errorDiv.innerHTML = '<div>error: ' + x + '</div>';
 errorDiv.clear = () => iterDiv.innerHTML = "";
+
+const filterButton = Extra.querySelector('#filter');
+filterButton.onclick = () => filter.toggle(NeuralContainer.canvas);
 
 const gradient = (x, max) => {
 	const r = Math.floor((x/max) * 255);
