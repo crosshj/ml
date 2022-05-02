@@ -5,7 +5,7 @@ const tOptions = {
 	shuffle: true,
 	log: 0
 };
-const netOptions = [20, 20, 1];
+const netOptions = [22, 20, 1];
 
 const { Architect, Trainer } = synaptic;
 const {
@@ -31,7 +31,20 @@ function getInputs(id, x, y, xmax, ymax){
 	const xBefore = getXBeforeBalance(id, x, y, xmax);
 	const leftUp = getLeftUpDiagBalance(id, x, y, xmax);
 	const rightUp = getRightUpDiagBalance(id, x, y, xmax);
-	const inputs = xyInputs.concat([yBefore, xBefore, leftUp, rightUp]);
+	
+	const CONSTANTS = [
+		0, 1
+	];
+	const inputs = [
+		// ...CONSTANTS,
+		//x,y,
+		//x*y > 50,
+		x > 5,
+		y > 5,
+		//Math.random(),
+		...xyInputs,
+		yBefore, xBefore, leftUp, rightUp
+	];
 	return inputs;
 }
 

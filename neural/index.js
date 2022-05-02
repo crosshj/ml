@@ -13,6 +13,8 @@ const notes = `
 todo:
 	- image error map
 	- indicate rate of change in network
+	
+after training is done, have it activate on an image made of random noise
 
 is anything really be learned here?
 does enything get stored in long-term memory?
