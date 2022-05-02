@@ -1,0 +1,140 @@
+const tOptions = {
+	rate: .03,
+	iterations: 100,
+	error: .002,
+	shuffle: true,
+	log: 0
+};
+const netOptions = [20, 20, 1];
+
+const { Architect, Trainer } = synaptic;
+const {
+	spread,
+	shrink,
+	intToBitArray,
+	intToOneBitInArray,
+	getXBeforeBalance,
+	getYBeforeBalance,
+	getLeftUpDiagBalance,
+	getRightUpDiagBalance
+} = pixelOps;
+const GRID_SIZE = 10;
+
+const net = new Architect.Perceptron(...netOptions);
+const trainer = new Trainer(net);
+
+function getInputs(id, x, y, xmax, ymax){
+	//position metrics
+	const xyInputs = intToBitArray(y,8).concat(intToBitArray(x,8));
+	//other metrics
+	const yBefore = getYBeforeBalance(id, x, y, xmax);
+	const xBefore = getXBeforeBalance(id, x, y, xmax);
+	const leftUp = getLeftUpDiagBalance(id, x, y, xmax);
+	const rightUp = getRightUpDiagBalance(id, x, y, xmax);
+	const inputs = xyInputs.concat([yBefore, xBefore, leftUp, rightUp]);
+	return inputs;
+}
+
+function trainingSetFromImageData(id, xmax, ymax){
+	var results = [];
+	var max = 0;
+	var min = 255;
+	id.data.forEach((x,i)=>{
+		if(i%4-1 != 0) return;
+		//green
+		if(max < x){ max = x; }
+		if(min > x){ min = x; }
+	});
+	for(var [x] of new Array(xmax).entries()){
+		for(var [y] of new Array(ymax).entries()){
+			const offset = xmax*y*4 + x*4;
+			results.push({
+				input: getInputs(id, x, y, xmax, ymax),
+				output: [
+					spread(id.data[offset + 1],max,min)/255
+				]
+			});
+		}
+	}
+	return results;
+}
+
+function imageFromNet(id, setter, xmax, ymax, nt){
+	for(var [x] of new Array(xmax).entries()){
+		for(var [y] of new Array(ymax).entries()){
+		const offset = xmax*y*4 + x*4;
+			var greenOutput = nt.activate(
+				getInputs(id, x, y, xmax, ymax)
+			)[0];
+			greenOutput = shrink(greenOutput * 255)
+			var _color = {
+				r: 0,
+				g: greenOutput,
+				b: 0,
+				a: 255
+			};
+			setter(id, _color, {x, y, xmax});
+		}
+	}
+	return id;
+}
+
+function activateNet(set){
+	const error = [];
+	for(const {input, output} of set){
+		const out = net.activate(input)[0];
+		error.push((out - output[0]) ** 2)
+	}
+	return {
+		error: Math.max(...error)*0.01
+	};
+}
+
+function train(args){
+	const {
+		x, y, ctx, set, setter, id, iterations=0, callback: cb,
+		setError, setIterations, setResults
+	} = args;
+
+	const callback = () => {
+		setResults({ iterations });
+		cb();
+	};
+
+	imageFromNet(id, setter, GRID_SIZE, GRID_SIZE, net);
+	//const testResults = activateNet(set);
+	const testResults = trainer.test(set, {
+		...tOptions,
+		error: tOptions.error*0.1
+	});
+
+	const errorOkay = testResults.error < tOptions.error;
+	const iterOkay = iterations < tOptions.iterations;
+	if(errorOkay || !iterOkay){
+		imageFromNet(id, setter, GRID_SIZE, GRID_SIZE, net);
+	}
+
+	requestAnimationFrame(async () => {
+		ctx.putImageData( id, x*GRID_SIZE, y*GRID_SIZE);
+
+		setError(testResults.error.toFixed(4));
+		setIterations(iterations);
+
+		if(!iterOkay) return callback();
+		if(errorOkay) return callback();
+
+		await trainer.trainAsync(set, tOptions);
+		train({ ...args, iterations: iterations+1 });
+	 });
+};
+
+const AlgoOne = (args) => {
+	const set = trainingSetFromImageData(args.id, GRID_SIZE, GRID_SIZE);
+	train({
+		...args,
+		set
+	});
+};
+
+export default AlgoOne;
+
