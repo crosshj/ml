@@ -2,11 +2,11 @@ import convnetjs from 'https://cdn.skypack.dev/convnetjs';
 let net;
 let trainer;
 
-const tOptions = {
-	iterations: 50
-}
+let tOptions;
+let netOptions;
 
-const init = () => {
+const init = (args) => {
+	({ tOptions, netOptions } = args);
 	const layer_defs = [
 		{type:'input', out_sx:10, out_sy:10, out_depth:1},
 		{type:'conv', sx:5, filters:400, stride:1, pad:0, activation:'relu'},
@@ -98,7 +98,7 @@ const render = ({ ctx, id, x, y }) => new Promise((resolve) => {
 const ConvOneTrain = async (args) => {
 	const { x, y, ctx, id, setter } = args;
 
-	if(!net) ({net, trainer} = init());
+	if(!net) ({net, trainer} = init(args));
 
 	const GRID_SIZE = 10;
 	const xmax = 10;
@@ -107,7 +107,8 @@ const ConvOneTrain = async (args) => {
 	const volume = getTrainingVolume(args);
 	const expected = trainArray(id, xmax, ymax).map(x => x.value)
 
-	for(var [it] of new Array(tOptions.iterations).entries()) {
+	let it;
+	for([it] of new Array(tOptions.iterations).entries()) {
 		trainer.train(
 			volume,
 			expected
@@ -118,13 +119,15 @@ const ConvOneTrain = async (args) => {
 		//TODO: set error
 		args.setIterations(it);
 	}
+	args.setResults({ iterations: it });
 	args.callback();
 };
 
 const ConvOneActivate = (args) => {
 	const { x, y, ctx, id, setter } = args;
 
-	if(!net) ({net, trainer} = init());
+	if(!net) ({net, trainer} = init(args));
+	if(args.x === 0 && args.y === 0) args.hideResults();
 
 	const GRID_SIZE = 10;
 	const xmax = 10;

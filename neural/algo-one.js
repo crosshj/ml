@@ -121,9 +121,6 @@ function train(args){
 
 	const errorOkay = testResults.error < tOptions.error;
 	const iterOkay = iterations < tOptions.iterations;
-	if(errorOkay || !iterOkay){
-		imageFromNet(id, setter, GRID_SIZE, GRID_SIZE, net);
-	}
 
 	requestAnimationFrame(async () => {
 		ctx.putImageData( id, x*GRID_SIZE, y*GRID_SIZE);
@@ -153,6 +150,7 @@ const SynOneTrain = (args) => {
 };
 
 const SynOneActivate = (args) => {
+	if(args.x === 0 && args.y === 0) args.hideResults();
 	netOptions = args.netOptions;
 	net = net || new Architect.Perceptron(...netOptions);
 	return imageFromNet(args.id, args.setter, GRID_SIZE, GRID_SIZE, net);

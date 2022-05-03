@@ -1,6 +1,7 @@
 import Extra from './extra.js';
 import SynOne from './algo-one.js';
 import NeatOne from './algo-two.js';
+import NeatTwo from './neat-two.js';
 import ConvOne from './conv-one.js';
 
 import '../shared/components/container.js';
@@ -37,7 +38,7 @@ https://github.com/karpathy/convnetjs/blob/4c3358a315b4d71f31a0d532eb5d1700e9e59
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
-function setImageDataPixel(imageData, {r=0, g=0, b=0, a=255}, {x=0, y=0, xmax=1}){
+function setter(imageData, {r=0, g=0, b=0, a=255}, {x=0, y=0, xmax=1}){
 	const ad = imageData.data;
 	const rowOffset = y * 4 * xmax;
 	const colOffset = x * 4;
@@ -58,124 +59,35 @@ const tOptions = {
 };
 const netOptions = [22, 20, 1];
 
-const syn1train = async (args) => new Promise((resolve) => {
-	const {x, y, id, readImage} = args;
+const wrapped = (fn) => async (args) => {
 	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	SynOne.train({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
+	if(args.x === 0 && args.y === 0){
+		//NeuralContainer.refreshButton.click();
+		extra.results.reset();
+	}
+	return fn({
+		...args,
+		tOptions, netOptions, ctx, setter,
 		setError: (error) => extra.error.set(error.toFixed(5)),
 		setIterations: extra.iterations.set,
 		setResults: extra.results.set,
 		clearResults: extra.results.reset,
-		callback: resolve
-	});
-});
-
-const syn1activate = async (args) => {
-	const {x, y, id, readImage} = args;
-	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	return SynOne.activate({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
-		setError: (error) => extra.error.set(error.toFixed(5)),
-		setIterations: extra.iterations.set,
-		setResults: extra.results.set,
-		clearResults: extra.results.reset,
+		hideResults: extra.results.hide
 	});
 };
-
-const neat1train = async (args) => new Promise((resolve) => {
-	const {x, y, id, readImage} = args;
-	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	NeatOne.train({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
-		setError: (error) => extra.error.set(error.toFixed(5)),
-		setIterations: extra.iterations.set,
-		setResults: extra.results.set,
-		clearResults: extra.results.reset,
-		callback: resolve
-	});
-});
-
-const neat1activate = async (args) => {
-	const {x, y, id, readImage} = args;
-	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	return NeatOne.activate({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
-		setError: (error) => extra.error.set(error.toFixed(5)),
-		setIterations: extra.iterations.set,
-		setResults: extra.results.set,
-		clearResults: extra.results.reset,
-	});
-};
-
-const conv1train = async (args) => new Promise((resolve) => {
-	const {x, y, id, readImage} = args;
-	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	ConvOne.train({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
-		setError: (error) => extra.error.set(error.toFixed(5)),
-		setIterations: extra.iterations.set,
-		setResults: extra.results.set,
-		clearResults: extra.results.reset,
-		callback: resolve
-	});
-});
-
-const conv1activate = async (args) => {
-	const {x, y, id, readImage} = args;
-	const ctx = NeuralContainer.canvas.getContext("2d");
-
-	if(x === 0 && y === 0) extra.results.reset();
-	return ConvOne.activate({
-		tOptions, netOptions,
-		x, y,
-		ctx,
-		id,
-		setter: setImageDataPixel,
-		setError: (error) => extra.error.set(error.toFixed(5)),
-		setIterations: extra.iterations.set,
-		setResults: extra.results.set,
-		clearResults: extra.results.reset,
-	});
-};
+const wrappedPromise = (fn) => async (args) => new Promise(
+	(resolve) => wrapped(fn)({ ...args, callback: resolve })
+);
 
 NeuralContainer.functions = {
-	syn1train,
-	syn1activate,
-	neat1train,
-	neat1activate,
-	conv1train,
-	conv1activate
+	syn1train: wrappedPromise(SynOne.train),
+	syn1activate: wrapped(SynOne.activate),
+	neat1train: wrappedPromise(NeatOne.train),
+	neat1activate: wrapped(NeatOne.activate),
+	neat2train: wrappedPromise(NeatTwo.train),
+	neat2activate: wrapped(NeatTwo.activate),
+	conv1train: wrappedPromise(ConvOne.train),
+	conv1activate: wrapped(ConvOne.activate)
 };
 
 NeuralContainer.onLoad(async () => {
