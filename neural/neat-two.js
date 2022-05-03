@@ -17,8 +17,8 @@ const init = (args) => {
 
 const trainArray = (id, xmax, ymax) => {
 	const array = [];
-	for(var [y] of new Array(xmax).entries()){
-		for(var [x] of new Array(ymax).entries()){
+	for(var [y] of new Array(ymax).entries()){
+		for(var [x] of new Array(xmax).entries()){
 			const offset = xmax*y*4 + x*4;
 			array.push({
 				x,
