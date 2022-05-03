@@ -64,7 +64,7 @@ function imageFromNet(id, setter, xmax, ymax, nt){
 			var output = nt.activate(
 				getInputs(id, x, y, xmax, ymax)
 			)[0];
-			const greenOutput = 255 * output;
+			let greenOutput = 255 * output;
 			if(greenOutput > 255) greenOutput = 255;
 			if(greenOutput < 0) greenOutput = 0;
 			var _color = {

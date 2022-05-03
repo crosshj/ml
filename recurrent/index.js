@@ -45,7 +45,7 @@ function classifier({x, y, id, readImage}){
 		// a softmax classifier predicting probabilities for two classes: 0,1
 		{type:'softmax', num_classes:3}
 	]);
-	
+
 	const volume = new convnetjs.Vol([0, 255, 0])
 
 	output.push(`%% no train %%`);

@@ -1,6 +1,7 @@
 import Extra from './extra.js';
 import SynOne from './algo-one.js';
 import NeatOne from './algo-two.js';
+import ConvOne from './conv-one.js';
 
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
@@ -29,7 +30,10 @@ what if after training, network could decide to not change?
 a nn with error set high is lossy.
 if it is trained on its own output, does it reach a lossless state?
 in this case, what's left of input?
-does traning get faster?
+does training get faster?
+
+draw previous layers with convnetjs:
+https://github.com/karpathy/convnetjs/blob/4c3358a315b4d71f31a0d532eb5d1700e9e592ee/demo/js/images-demo.js#L235
 `;
 NeuralContainer.setNotes(notes.replace(/\t/g, '   '));
 
@@ -128,11 +132,50 @@ const neat1activate = async (args) => {
 	});
 };
 
+const conv1train = async (args) => new Promise((resolve) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
+
+	if(x === 0 && y === 0) extra.results.reset();
+	ConvOne.train({
+		tOptions, netOptions,
+		x, y,
+		ctx,
+		id,
+		setter: setImageDataPixel,
+		setError: (error) => extra.error.set(error.toFixed(5)),
+		setIterations: extra.iterations.set,
+		setResults: extra.results.set,
+		clearResults: extra.results.reset,
+		callback: resolve
+	});
+});
+
+const conv1activate = async (args) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
+
+	if(x === 0 && y === 0) extra.results.reset();
+	return ConvOne.activate({
+		tOptions, netOptions,
+		x, y,
+		ctx,
+		id,
+		setter: setImageDataPixel,
+		setError: (error) => extra.error.set(error.toFixed(5)),
+		setIterations: extra.iterations.set,
+		setResults: extra.results.set,
+		clearResults: extra.results.reset,
+	});
+};
+
 NeuralContainer.functions = {
 	syn1train,
 	syn1activate,
 	neat1train,
 	neat1activate,
+	conv1train,
+	conv1activate
 };
 
 NeuralContainer.onLoad(async () => {
