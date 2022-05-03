@@ -59,7 +59,7 @@ const style = `
 	#bg-image { display: none; }
 }
 .container {
-	/* height: 100vh; */
+	min-height: 100vh;
 	max-width: 820px;
 	width: 100vw;
 	margin: auto;

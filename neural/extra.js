@@ -85,7 +85,7 @@ const Results = (extra) => {
 			div.append(square);
 		},
 		reset: () => {
-			div.style.display = 'none';
+			//div.style.display = 'none';
 			div.innerHTML = '';
 		}
 	};

@@ -8,18 +8,22 @@
 		return new Array(to).fill();
 	}
 
-		var _max = 255;
+	var _max = 255;
 	var _min = 0;
 	function spread(val, max, min){
 		_max = max;
 		_min = min;
-		return (val-min)*(255/(max-min));
+		if(max-min === 0) return 0;
+		return Math.floor(
+			(val-min)*(255/(max-min))
+		);
 	}
 
 	function shrink(val){
 		return (val * ((_max-_min)/255))+_min;
 	}
 
+	const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
 	const intToBitArray = (number, len) => {
 		function padLeft(nr, n, str){
@@ -106,6 +110,7 @@
 
 	window.pixelOps = {
 		clone,
+		clamp,
 		range,
 		spread,
 		shrink,

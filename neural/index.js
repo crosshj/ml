@@ -1,5 +1,7 @@
 import Extra from './extra.js';
-import AlgoOne from './algo-one.js';
+import SynOne from './algo-one.js';
+import NeatOne from './algo-two.js';
+
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -42,24 +44,95 @@ function setImageDataPixel(imageData, {r=0, g=0, b=0, a=255}, {x=0, y=0, xmax=1}
 	ad[offset + 3]   = a;
 }
 
-const neural = async (args) => new Promise((resolve) => {
+const tOptions = {
+	momentum: 0.9, //neataptic-only
+	rate: .03,
+	iterations: 100,
+	error: .002,
+	shuffle: false,
+	log: 0
+};
+const netOptions = [22, 20, 1];
+
+const syn1train = async (args) => new Promise((resolve) => {
 	const {x, y, id, readImage} = args;
 	const ctx = NeuralContainer.canvas.getContext("2d");
 
-	AlgoOne({
+	if(x === 0 && y === 0) extra.results.reset();
+	SynOne.train({
+		tOptions, netOptions,
 		x, y,
 		ctx,
 		id,
 		setter: setImageDataPixel,
-		setError: extra.error.set,
+		setError: (error) => extra.error.set(error.toFixed(5)),
 		setIterations: extra.iterations.set,
 		setResults: extra.results.set,
+		clearResults: extra.results.reset,
 		callback: resolve
 	});
 });
 
+const syn1activate = async (args) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
+
+	if(x === 0 && y === 0) extra.results.reset();
+	return SynOne.activate({
+		tOptions, netOptions,
+		x, y,
+		ctx,
+		id,
+		setter: setImageDataPixel,
+		setError: (error) => extra.error.set(error.toFixed(5)),
+		setIterations: extra.iterations.set,
+		setResults: extra.results.set,
+		clearResults: extra.results.reset,
+	});
+};
+
+const neat1train = async (args) => new Promise((resolve) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
+
+	if(x === 0 && y === 0) extra.results.reset();
+	NeatOne.train({
+		tOptions, netOptions,
+		x, y,
+		ctx,
+		id,
+		setter: setImageDataPixel,
+		setError: (error) => extra.error.set(error.toFixed(5)),
+		setIterations: extra.iterations.set,
+		setResults: extra.results.set,
+		clearResults: extra.results.reset,
+		callback: resolve
+	});
+});
+
+const neat1activate = async (args) => {
+	const {x, y, id, readImage} = args;
+	const ctx = NeuralContainer.canvas.getContext("2d");
+
+	if(x === 0 && y === 0) extra.results.reset();
+	return NeatOne.activate({
+		tOptions, netOptions,
+		x, y,
+		ctx,
+		id,
+		setter: setImageDataPixel,
+		setError: (error) => extra.error.set(error.toFixed(5)),
+		setIterations: extra.iterations.set,
+		setResults: extra.results.set,
+		clearResults: extra.results.reset,
+	});
+};
+
 NeuralContainer.functions = {
-	neural,
+	syn1train,
+	syn1activate,
+	neat1train,
+	neat1activate,
 };
 
 NeuralContainer.onLoad(async () => {
