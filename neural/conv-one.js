@@ -9,7 +9,7 @@ const tOptions = {
 const init = () => {
 	const layer_defs = [
 		{type:'input', out_sx:10, out_sy:10, out_depth:1},
-		{type:'conv', sx:5, filters:300, stride:1, pad:0, activation:'tanh'},
+		{type:'conv', sx:5, filters:400, stride:1, pad:0, activation:'relu'},
 		//{type:'pool', sx:1, stride:2},
 		// {type:'fc', num_neurons:500, activation:'tanh'},
 		// {type:'fc', num_neurons:500, activation:'tanh'},
@@ -21,7 +21,7 @@ const init = () => {
 		// {type:'fc', num_neurons:20, activation:'relu'},
 		// {type:'fc', num_neurons:20, activation:'relu'},
 		// {type:'fc', num_neurons:20, activation:'relu'},
-		{type:'fc', num_neurons:100, activation:'relu'},
+		//{type:'fc', num_neurons:1000, activation:'relu'},
 		//{type:'fc', num_neurons:5000, activation:'relu'},
 		{type:'regression', num_neurons:10*10}
 	];
