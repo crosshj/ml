@@ -3,6 +3,7 @@ import SynOne from './algo-one.js';
 import NeatOne from './algo-two.js';
 import NeatTwo from './neat-two.js';
 import ConvOne from './conv-one.js';
+import BrainOne from './brain-one.js';
 
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
@@ -68,7 +69,7 @@ const wrapped = (fn) => async (args) => {
 	return fn({
 		...args,
 		tOptions, netOptions, ctx, setter,
-		setError: (error) => extra.error.set(error.toFixed(5)),
+		setError: (error) => extra.error.set(error.toFixed(10)),
 		setIterations: extra.iterations.set,
 		setResults: extra.results.set,
 		clearResults: extra.results.reset,
@@ -87,7 +88,9 @@ NeuralContainer.functions = {
 	neat2train: wrappedPromise(NeatTwo.train),
 	neat2activate: wrapped(NeatTwo.activate),
 	conv1train: wrappedPromise(ConvOne.train),
-	conv1activate: wrapped(ConvOne.activate)
+	conv1activate: wrapped(ConvOne.activate),
+	brain1train: wrappedPromise(BrainOne.train),
+	brain1activate: wrapped(BrainOne.activate)
 };
 
 NeuralContainer.onLoad(async () => {
