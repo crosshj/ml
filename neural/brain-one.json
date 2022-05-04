@@ -30943,18 +30943,18 @@
             100,
             100
         ],
-        "learningRate": 0.03,
+        "learningRate": 0.01,
         "decayRate": 0.999
     },
     "trainOpts": {
         "activation": "sigmoid",
-        "iterations": 1,
-        "errorThresh": 0.0002,
+        "iterations": 500,
+        "errorThresh": 0.0001,
         "log": false,
         "logPeriod": 10,
         "leakyReluAlpha": 0.01,
-        "learningRate": 0.03,
-        "momentum": 0.1,
+        "learningRate": 0.01,
+        "momentum": 0.05,
         "callbackPeriod": 10,
         "timeout": "Infinity",
         "beta1": 0.9,

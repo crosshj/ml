@@ -93,7 +93,8 @@ const train = async (args) => {
 		imageFromNet(id, setter, xmax, ymax, output);
 		await render({ ctx, id, x: x*GRID_SIZE, y: y*GRID_SIZE });
 
-		const testResults = trainer.train([{ input: trainData, output: trainData }], tOptions);
+		const testResults = trainer.train([{ input: trainData, output: trainData }]);
+		//const testResults = trainer.train([{ input: trainData, output: trainData }], tOptions);
 		args.setError(testResults.error);
 		args.setIterations(it*tOptions.iterations);
 
