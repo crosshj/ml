@@ -11,7 +11,7 @@ const init = (args) => {
 	tOptions = {
 		//...tOptions,
 		log: false,
-		errorThresh: tOptions.error * 0.1,
+		errorThresh: tOptions.error * 0.01,
 		iterations: tOptions.iterations*2,
 	};
 	// netOptions = {
