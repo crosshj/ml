@@ -4,6 +4,10 @@ references:
 https://gist.github.com/kuon/c9f59b33a71f8e6fcba0c9560f21c21a
 https://www.phpied.com/canvas-pixels-2-convolution-matrix/
 
+
+kernels:
+https://ietresearch.onlinelibrary.wiley.com/doi/10.1049/iet-ipr.2019.1681
+https://stackoverflow.com/questions/58383477/how-to-create-a-python-convolution-kernel
 */
 
 
