@@ -126,11 +126,12 @@ https://en.wikipedia.org/wiki/Cyclic_cellular_automaton
 http://software-tecnico-libre.es/en/article-by-topic/data-analytics/complex-systems/cellular-automata/cellular-automata-winca-3
 http://www.mirekw.com/ca/ca_files_formats.html
 */
-function cyclicParticle(setter){
+function cyclicParticle(setter, { iterations:its, id: input_id, bands: bandsIn } = {}){
+	if(input_id) randomImageData = input_id;
 	if(!randomImageData) random.bind(this)(setter);
 	const id = randomImageData;
-	const bands = 3;
-	const [ bandColors, max_iter] = ([
+	const bands = bandsIn || 3;
+	const [ bandColors, _max_iter] = ([
 		,, //zero and one (not available)
 		[
 			[0, 255],
@@ -162,6 +163,7 @@ function cyclicParticle(setter){
 			15000
 		], //twelve
 	][bands]);
+	const max_iter = its || _max_iter;
 	const width = 160;
 	const height = 120;
 

@@ -469,7 +469,9 @@ async function ready(){
 					}
 					await run({ x, y, fn, steps, step, pass, passes });
 					step+=1;
+					if(step >= steps) break;
 				}
+				if(step >= steps) break;
 			}
 			step=0;
 		}
