@@ -72,13 +72,28 @@ const dummyFn = (filter) => {
 	};
 };
 
-const oneStep = () => {
-	CanvasText('one step!');
+const oneStep = ({ steps, step, passes=1, pass=0 }) => {
+	CanvasText(`
+step: ${step+1} of ${steps}
+pass: ${pass+1} of ${passes}
+${pass === passes-1 ? 'done!': ''}
+	`.trim());
+};
+
+const multiPass = async ({ x,y, steps, step, pass, passes }) => {
+	if(x !== 0 || y !== 0) return;
+	CanvasText(`
+step: ${step+1} of ${steps}
+pass: ${pass+1} of ${passes}
+${pass === passes-1 ? 'done!': ''}
+	`.trim());
+	await new Promise((resolve) => setTimeout(resolve, 1000));
 };
 
 NeuralContainer.functions = {
 	dryRun: dummyFn('dry-run'),
 	oneStep,
+	multiPass,
 	imageOverflowDL,
 	imageOverflowDR,
 	imageOverflowUL,

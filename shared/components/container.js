@@ -385,7 +385,8 @@ async function ready(){
 		return {
 			name: x.getAttribute('name') || x.getAttribute('event'),
 			value: x.getAttribute('event') || x.getAttribute('name'),
-			steps: x.getAttribute('steps') ? Number(x.getAttribute('steps')) : ''
+			steps: x.getAttribute('steps') ? Number(x.getAttribute('steps')) : '',
+			pass: x.getAttribute('pass') ? Number(x.getAttribute('pass')) : ''
 		}
 	});
 	functionSelector.innerHTML = fnOptions
@@ -403,14 +404,15 @@ async function ready(){
 		this.paused = 'canceled';
 	}
 
-	const done = ({ steps }={}) => {
+	const done = ({ steps, passes }={}) => {
 		this.canvasReadOnly = cloneCanvas(this.canvas);
-		steps !== 1 && setTimeout(_ShowOverlayBlock, 1000);
+		const hideOverlay = steps !== 1 && !passes;
+		hideOverlay && setTimeout(_ShowOverlayBlock, 1000);
 		runButton.classList.remove('hidden');
 		pauseButton.classList.add('hidden');
 	};
 
-	const run = async ({ x,y,fn,steps }) => {
+	const run = async ({ x,y,fn,steps, step, passes, pass }) => {
 		steps !== 1 && _ShowOverlayBlock(x,y);
 		const { id } = readBlock.bind(this)({
 			x, y, width: 10, height: 10
@@ -423,9 +425,9 @@ async function ready(){
 			height: 10 + (offset.height || 0),
 		});
 		const newImgData = await fn({
-			x, y, id, readImage
+			x, y, id, readImage, steps, step, passes, pass,
 		});
-		await writeBlock.bind(this)({
+		newImgData && await writeBlock.bind(this)({
 			x, y, width: 10, height: 10, imageData: newImgData
 		});
 	};
@@ -445,28 +447,33 @@ async function ready(){
 			delete this.paused;
 		}
 		const { currentFunction, functions } = this;
-		const { steps } = fnOptions.find(x => x.value === currentFunction) || {};
+		const { steps, pass: passes } = fnOptions.find(x => x.value === currentFunction) || {};
 		const fn = functions[currentFunction];
 
 		if(!fn){
 			console.log('Function not defined: ' + currentFunction);
 			return;
 		}
-		if(steps === 1){
-			await run({ x:0, y:0, fn, steps });
+		if(steps === 1 && !passes){
+			await run({ x:0, y:0, fn, steps, step: 0 });
 			done({ steps });
 			return;
 		}
-		for(var [x] of new Array(16).entries()){
-			for(var [y] of new Array(12).entries()){
-				if(this.paused){
-					const status = await this.paused;
-					if(status === 'canceled') break;
+		let step=0;
+		for(var [pass] of new Array(passes||1).entries()){
+			for(var [x] of new Array(16).entries()){
+				for(var [y] of new Array(12).entries()){
+					if(this.paused){
+						const status = await this.paused;
+						if(status === 'canceled') break;
+					}
+					await run({ x, y, fn, steps, step, pass, passes });
+					step+=1;
 				}
-				await run({ x, y, fn, steps });
 			}
+			step=0;
 		}
-		done();
+		done({ passes });
 	}
 	pauseButton.onclick = async () => {
 		let pausedResolve;
