@@ -111,15 +111,25 @@ function random(setter){
 	ctx.putImageData( randomImageData, 0, 0 );
 }
 
+/*
+todo perlin noise (clouds)
+https://gist.github.com/adefossez/0646dbe9ed4005480a2407c62aac8869
+https://asserttrue.blogspot.com/2011/12/perlin-noise-in-javascript_31.html
+*/
+
+
 
 /*
 http://ciri.be/blog/?p=71
 https://web.archive.org/web/20080807134544/http://psoup.math.wisc.edu/archive/recipe1.html
+https://en.wikipedia.org/wiki/Cyclic_cellular_automaton
+http://software-tecnico-libre.es/en/article-by-topic/data-analytics/complex-systems/cellular-automata/cellular-automata-winca-3
+http://www.mirekw.com/ca/ca_files_formats.html
 */
 function cyclicParticle(setter){
 	if(!randomImageData) random.bind(this)(setter);
 	const id = randomImageData;
-	const bands = 8;
+	const bands = 3;
 	const [ bandColors, max_iter] = ([
 		,, //zero and one (not available)
 		[

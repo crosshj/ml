@@ -50,7 +50,7 @@ NeuralContainer.functions = {
 
 NeuralContainer.onLoad(async () => {
 	//await NeuralContainer.changeImage('frog');
-	NeuralContainer.runButton.onclick()
+	//NeuralContainer.runButton.onclick()
 });
 
 await NeuralContainer.ready;
