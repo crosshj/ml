@@ -137,5 +137,5 @@ NeuralContainer.functions = {
 };
 
 NeuralContainer.onLoad(async () => {
-	NeuralContainer.runButton.onclick()
+	//NeuralContainer.runButton.onclick()
 });
