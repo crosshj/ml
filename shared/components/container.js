@@ -454,6 +454,7 @@ async function ready(){
 			console.log('Function not defined: ' + currentFunction);
 			return;
 		}
+		console.log({ steps, passes })
 		if(steps === 1 && !passes){
 			await run({ x:0, y:0, fn, steps, step: 0 });
 			done({ steps });
@@ -469,9 +470,9 @@ async function ready(){
 					}
 					await run({ x, y, fn, steps, step, pass, passes });
 					step+=1;
-					if(step >= steps) break;
+					if(steps && step >= steps) break;
 				}
-				if(step >= steps) break;
+				if(steps && step >= steps) break;
 			}
 			step=0;
 		}

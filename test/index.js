@@ -96,7 +96,7 @@ pass: ${pass+1} of ${passes}
 	CanvasText(stepText + '\ndone!');
 };
 
-const _multiPass = async ({ x,y, steps, step, pass, passes }) => {
+const multiPass = async ({ x,y, steps, step, pass, passes }) => {
 	if(x !== 0 || y !== 0) return;
 	CanvasText(`
 step: ${step+1} of ${steps}
@@ -106,7 +106,7 @@ ${pass === passes-1 ? 'done!': ''}
 	await delay(1000);
 };
 
-const multiPass = async ({ x,y, steps, step, pass, passes }) => {
+const cyclicCell = async ({ x,y, steps, step, pass, passes }) => {
 	const width = 160;
 	const height = 120;
 	const cyclic = canvasOps.cyclicParticle.bind({
@@ -129,6 +129,7 @@ NeuralContainer.functions = {
 	dryRun: dummyFn('dry-run'),
 	oneStep,
 	multiPass,
+	cyclicCell,
 	imageOverflowDL,
 	imageOverflowDR,
 	imageOverflowUL,
