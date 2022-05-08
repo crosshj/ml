@@ -424,8 +424,9 @@ async function ready(){
 			width: 10 + (offset.width || 0),
 			height: 10 + (offset.height || 0),
 		});
+		const resetImage = () => changeImage(imageSelector.value);
 		const newImgData = await fn({
-			x, y, id, readImage, steps, step, passes, pass,
+			x, y, id, readImage, steps, step, passes, pass, resetImage,
 		});
 		newImgData && await writeBlock.bind(this)({
 			x, y, width: 10, height: 10, imageData: newImgData
@@ -454,7 +455,7 @@ async function ready(){
 			console.log('Function not defined: ' + currentFunction);
 			return;
 		}
-		console.log({ steps, passes })
+		//console.log({ steps, passes })
 		if(steps === 1 && !passes){
 			await run({ x:0, y:0, fn, steps, step: 0 });
 			done({ steps });

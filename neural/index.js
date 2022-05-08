@@ -4,6 +4,7 @@ import NeatOne from './algo-two.js';
 import NeatTwo from './neat-two.js';
 import ConvOne from './conv-one.js';
 import BrainOne from './brain-one.js';
+import BrainTwo from './brain-two.js';
 
 import '../shared/components/container.js';
 import convnetjs from 'https://cdn.skypack.dev/convnetjs';
@@ -90,7 +91,9 @@ NeuralContainer.functions = {
 	conv1train: wrappedPromise(ConvOne.train),
 	conv1activate: wrapped(ConvOne.activate),
 	brain1train: wrappedPromise(BrainOne.train),
-	brain1activate: wrapped(BrainOne.activate)
+	brain1activate: wrapped(BrainOne.activate),
+	brain2train: wrappedPromise(BrainTwo.train),
+	brain2activate: wrapped(BrainTwo.activate),
 };
 
 NeuralContainer.onLoad(async () => {
