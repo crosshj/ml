@@ -28,7 +28,7 @@ const init = (args) => {
 		// learningRate: 0.005,
 		// decayRate: 0.005,
 	};
-	const net = new brain.NeuralNetworkGPU(/*netOptions*/);
+	const net = new brain.NeuralNetwork(/*netOptions*/);
 	net.fromJSON(brainStored);
 	const trainer = net;
 	net.activate = net.run;
@@ -116,7 +116,7 @@ const train = async (args) => {
 
 	const trainData = trainArray(id, xmax, ymax).map(x => x.value);
 
-	const max_iter = Math.random() > 0.9
+	const max_iter = Math.random() > 0.95
 		? 100
 		: tOptions.iterations;
 
