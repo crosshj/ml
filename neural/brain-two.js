@@ -46,7 +46,10 @@ const trainArray = (id, xmax, ymax) => {
 				x,
 				y,
 				channel: 1,
-				value: id.data[offset+1/*green channel*/] / 255
+				value: id.data[offset+1/*green channel*/] / 255,
+				r: id.data[offset] / 255,
+				g: id.data[offset+1] / 255,
+				b: id.data[offset+2] / 255,
 			});
 		}
 	}
@@ -65,6 +68,22 @@ function imageFromNet(id, setter, xmax, ymax, nt){
 				r: 0,
 				g: Math.floor(greenOutput),
 				b: 0,
+				a: 255
+			};
+			setter(id, _color, {x, y, xmax});
+		}
+	}
+	return id;
+}
+
+function imageFromNetRGB(id, setter, xmax, ymax, nt){
+	var [r,g,b] = nt;
+	for(var [x] of new Array(xmax).entries()){
+		for(var [y] of new Array(ymax).entries()){
+			var _color = {
+				r: Math.floor(r[y*xmax + x]*255),
+				g: Math.floor(g[y*xmax + x]*255),
+				b: Math.floor(b[y*xmax + x]*255),
 				a: 255
 			};
 			setter(id, _color, {x, y, xmax});
@@ -145,13 +164,12 @@ const activate = (args) => {
 	const xmax = 10;
 	const ymax = 10;
 
-	const trainData = trainArray(id, xmax, ymax).map(x => x.value);
-	// net.train([{ input: trainData, output: trainData }], {
-	// 	...tOptions,
-	// 	iterations: 1
-	// });
-	const output = net.activate(trainData);
-	return imageFromNet(id, setter, xmax, ymax, output);
+	const output = []
+	for(let color of ["r","g","b"]){
+		const trainData = trainArray(id, xmax, ymax).map(x => x[color]);
+		output.push(net.activate(trainData));
+	}
+	return imageFromNetRGB(id, setter, xmax, ymax, output);
 };
 
 export default {
