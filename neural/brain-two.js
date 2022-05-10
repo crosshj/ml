@@ -17,22 +17,22 @@ const init = (args) => {
 	};
 	netOptions = {
 		// //...netOptions,
-		// inputSize: 10*10,
-		// inputRange: 255,
-		// hiddenLayers: [75, 100, 1200, 400],
-		// //activation: 'sigmoid',
-		// activation: 'relu',
-		// //activation: 'leaky-relu', // supported activation types: ['sigmoid', 'relu', 'leaky-relu', 'tanh'],
-		// leakyReluAlpha: 0.01, // supported for activation type 'leaky-relu'
-		// outputSize: 10*10,
-		// learningRate: 0.005,
-		// decayRate: 0.005,
+		inputSize: 10*10,
+		inputRange: 255,
+		hiddenLayers: [75, 100, 1200, 400],
+		activation: 'sigmoid',
+		//activation: 'relu',
+		//activation: 'leaky-relu', // supported activation types: ['sigmoid', 'relu', 'leaky-relu', 'tanh'],
+		//leakyReluAlpha: 0.01, // supported for activation type 'leaky-relu'
+		outputSize: 10*10,
+		learningRate: 0.3,
+		decayRate: 0.5,
 	};
-	const net = new brain.NeuralNetwork(/*netOptions*/);
-	net.fromJSON(brainStored);
+	const net = new brain.NeuralNetworkGPU(netOptions);
+	//net.fromJSON(brainStored);
 	const trainer = net;
 	net.activate = net.run;
-	//net.initialize();
+	net.initialize();
 
 	return { net, trainer }
 };
@@ -121,7 +121,7 @@ const train = async (args) => {
 		: tOptions.iterations;
 
 	var it=0;
-	for([it] of new Array(max_iter).entries()) {
+	for([it] of new Array(1||max_iter).entries()) {
 		const output = net.activate(trainData);
 		imageFromNet(id, setter, xmax, ymax, output);
 		await render({ ctx, id, x: x*GRID_SIZE, y: y*GRID_SIZE });
@@ -130,8 +130,8 @@ const train = async (args) => {
 		const testResults = trainer.train([{ input: trainData, output: trainData }],{
 			...tOptions,
 			iterations: tOptions.iterations === max_iter
-				? 10
-				: 2
+				? 5
+				: 5
 		});
 		args.setError(testResults.error);
 		args.setIterations(it*10);

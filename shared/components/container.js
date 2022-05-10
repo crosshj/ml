@@ -156,6 +156,19 @@ select:focus, select:active {
 		padding: 0.5em;
 	}
 }
+.rotated-fs {
+	position: absolute;
+	transform: rotate(90deg);
+
+	transform-origin: bottom left;
+	width: 100vh;
+	height: 100vw;
+	margin-top: -100vw;
+	object-fit: cover;
+
+	z-index: 4;
+	visibility: visible;
+}
 `.trim();
 
 async function CanvasText(text){
@@ -487,6 +500,16 @@ async function ready(){
 		runButton.classList.remove('hidden');
 		pauseButton.classList.add('hidden');
 	};
+	this.expandButton.onclick = async () => {
+		this.compressButton.classList.remove('hidden');
+		this.expandButton.classList.add('hidden');
+		this.canvasContainer.classList.add('rotated-fs');
+	};
+	this.compressButton.onclick = async () => {
+		this.expandButton.classList.remove('hidden');
+		this.compressButton.classList.add('hidden');
+		this.canvasContainer.classList.remove('rotated-fs');
+	};
 	await changeFunction(functionSelector.value);
 	await changeImage(imageSelector.value);
 	await loadedCallback.bind(this)();
@@ -529,6 +552,12 @@ class Container extends HTMLElement {
 				</button>
 				<select name="function" id="function-selector"></select>
 				<select name="image" id="image-selector"></select>
+				<button id="screen-expand">
+					<i class="fa fa-expand"></i>
+				</button>
+				<button id="screen-compress" class="hidden">
+					<i class="fa fa-compress"></i>
+				</button>
 			</div>
 			<div class="extend"></div>
 			<slot name="notes"></slot>
@@ -539,6 +568,7 @@ class Container extends HTMLElement {
 		this.functions = [];
 		this.loadedHandlers = [];
 		this.container = this.shadowRoot.querySelector('.container');
+		this.canvasContainer = this.shadowRoot.querySelector('.canvas-container');
 		this.background = this.shadowRoot.querySelector('.background');
 		this.bgImage = this.shadowRoot.querySelector('#bg-image');
 		this.canvas = this.shadowRoot.querySelector('.container #canvas1');
@@ -548,6 +578,8 @@ class Container extends HTMLElement {
 		this.runButton = this.shadowRoot.querySelector('#play');
 		this.pauseButton = this.shadowRoot.querySelector('#pause');
 		this.refreshButton = this.shadowRoot.querySelector('#refresh');
+		this.expandButton = this.shadowRoot.querySelector('#screen-expand');
+		this.compressButton = this.shadowRoot.querySelector('#screen-compress');
 
 		this.imageSelector = this.shadowRoot.querySelector('#image-selector');
 		this.imagesSlot = this.shadowRoot.querySelector('slot[name="images"]');
