@@ -168,6 +168,12 @@ select:focus, select:active {
 
 	z-index: 4;
 	visibility: visible;
+	background: #222222;
+}
+.rotated-fs #canvas1 {
+	width: auto;
+	margin: auto;
+	height: 100%;
 }
 `.trim();
 
