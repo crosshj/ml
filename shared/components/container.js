@@ -175,6 +175,19 @@ select:focus, select:active {
 	margin: auto;
 	height: 100%;
 }
+.rotated-fs #screen-compress {
+	position: absolute;
+	right: 0.75em;
+	top: 0.75em;
+	width: auto;
+	background: transparent;
+	border: 0;
+	font-size: 1.5em;
+	opacity: .5;
+}
+.rotated-fs #canvas-overlay{
+	margin: auto;
+}
 `.trim();
 
 async function CanvasText(text){
@@ -510,11 +523,13 @@ async function ready(){
 		this.compressButton.classList.remove('hidden');
 		this.expandButton.classList.add('hidden');
 		this.canvasContainer.classList.add('rotated-fs');
+		this.canvasOverlay.style.width = this.canvas.clientWidth + 'px';
 	};
 	this.compressButton.onclick = async () => {
 		this.expandButton.classList.remove('hidden');
 		this.compressButton.classList.add('hidden');
 		this.canvasContainer.classList.remove('rotated-fs');
+		this.canvasOverlay.style.width = '';
 	};
 	await changeFunction(functionSelector.value);
 	await changeImage(imageSelector.value);
@@ -543,6 +558,9 @@ class Container extends HTMLElement {
 			<div class="canvas-container">
 				<canvas id="canvas1" width="160" height="120"></canvas>
 				<canvas id="canvas-overlay" width="480" height="360"></canvas>
+				<button id="screen-compress" class="hidden">
+					<i class="fa fa-compress"></i>
+				</button>
 			</div>
 			<div class="controls">
 				<div id="run">
@@ -560,9 +578,6 @@ class Container extends HTMLElement {
 				<select name="image" id="image-selector"></select>
 				<button id="screen-expand">
 					<i class="fa fa-expand"></i>
-				</button>
-				<button id="screen-compress" class="hidden">
-					<i class="fa fa-compress"></i>
 				</button>
 			</div>
 			<div class="extend"></div>
