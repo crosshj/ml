@@ -524,12 +524,22 @@ async function ready(){
 		this.expandButton.classList.add('hidden');
 		this.canvasContainer.classList.add('rotated-fs');
 		this.canvasOverlay.style.width = this.canvas.clientWidth + 'px';
+		document.body.requestFullscreen(/*{ navigationUI: "show" }*/)
+			.then(() => {})
+			.catch(err => {
+				alert(`An error occurred while trying to switch into fullscreen mode: ${err.message} (${err.name})`);
+			});
 	};
 	this.compressButton.onclick = async () => {
 		this.expandButton.classList.remove('hidden');
 		this.compressButton.classList.add('hidden');
 		this.canvasContainer.classList.remove('rotated-fs');
 		this.canvasOverlay.style.width = '';
+		document.exitFullscreen(/*{ navigationUI: "show" }*/)
+			.then(() => {})
+			.catch(err => {
+				alert(`An error occurred while trying to switch into fullscreen mode: ${err.message} (${err.name})`);
+			});
 	};
 	await changeFunction(functionSelector.value);
 	await changeImage(imageSelector.value);
